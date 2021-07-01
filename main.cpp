@@ -1,24 +1,17 @@
-#include <SFML/Graphics.hpp>
+#include "lib/headers/Matrix.h"
 
-/*int main()
-{
-    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+//g++ main.o -o main -lsfml-graphics -lsfml-window -lsfml-system
 
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
+int main(){
 
-        window.clear();
-        window.draw(shape);
-        window.display();
-    }
+    FILE* input = fopen("matrix.txt", "r");
 
-    return 0;
-}*/
+    Matrix obj_1(input);
+    Matrix obj_2(3, 4, 2); 
+
+    printf("obj_1:\n");
+    obj_1.print(stdout);
+
+    printf("obj_2:\n");
+    obj_2.print(stdout);
+}
