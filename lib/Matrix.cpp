@@ -7,14 +7,14 @@ Matrix::Matrix(int horizontal_size, int vertical_size, float* numbers){//коп�
     if (numbers != NULL){
 
         data = (float*)calloc(horizontal_size * vertical_size, sizeof(float));
-        row_count = vertical_size;
+        rows_count = vertical_size;
         columns_count = horizontal_size;
 
         memcpy(data, numbers, horizontal_size * vertical_size * sizeof(float));
     } else{
 
         data = (float*)calloc(horizontal_size * vertical_size, sizeof(float));
-        row_count = vertical_size;
+        rows_count = vertical_size;
         columns_count = horizontal_size;
 
         for (int i = 0; i < horizontal_size * vertical_size; i++){
@@ -36,7 +36,7 @@ Matrix::Matrix(int horizontal_size, int vertical_size, float diag_elem){//зап
         data = NULL;
     }
     
-    row_count = vertical_size;
+    rows_count = vertical_size;
     columns_count = horizontal_size;
 
     for (int i = 0; i < horizontal_size * vertical_size; i++){
@@ -44,11 +44,11 @@ Matrix::Matrix(int horizontal_size, int vertical_size, float diag_elem){//зап
         data[i] = 0;
     }
 
-    if (row_count == columns_count){
+    if (rows_count == columns_count){
 
-        for (int i = 0; i < row_count; i++){
+        for (int i = 0; i < rows_count; i++){
 
-            data[i * row_count + i] = diag_elem;
+            data[i * rows_count + i] = diag_elem;
         }
     }
 }
@@ -85,7 +85,7 @@ Matrix::Matrix(FILE* input){
     float tmp = 0;
 
     data = NULL;
-    row_count = 0;
+    rows_count = 0;
     columns_count = 0;
 
     if (input != NULL){
@@ -103,13 +103,13 @@ Matrix::Matrix(FILE* input){
                 
                 if (columns_count != 0){
 
-                    assert(cur_size - row_count * columns_count == columns_count);
+                    assert(cur_size - rows_count * columns_count == columns_count);
                 } else{
 
                     columns_count = cur_size;
                 }
 
-                row_count++;
+                rows_count++;
             }
 
             scanf_ret = fscanf(input, "%f", &tmp);
@@ -117,20 +117,18 @@ Matrix::Matrix(FILE* input){
 
         fseek(input, 0, SEEK_SET); 
     }
-
-    
-
-    printf("in constructor row_count = %i and col_count = %i\n", row_count, columns_count);
 }
 
 Matrix::Matrix(const Matrix& old_obj){
 
     printf("Конструктор глубокого копирования\n\n");
 
-    row_count = old_obj.row_count;
+    data = (float*)calloc(old_obj.rows_count * old_obj.columns_count, sizeof(float));
+
+    rows_count = old_obj.rows_count;
     columns_count = old_obj.columns_count;
 
-    memcpy(data, old_obj.data, row_count * columns_count * sizeof(float));
+    memcpy(data, old_obj.data, rows_count * columns_count * sizeof(float));
 }
 
 Matrix::Matrix(Matrix&& old_obj){
@@ -138,11 +136,11 @@ Matrix::Matrix(Matrix&& old_obj){
     printf("Конструктор перемещения\n\n");
 
     data = old_obj.data;
-    row_count = old_obj.row_count;
+    rows_count = old_obj.rows_count;
     columns_count = old_obj.columns_count;
 
     old_obj.data = NULL;
-    old_obj.row_count = 0;
+    old_obj.rows_count = 0;
     old_obj.columns_count = 0;
 }
 
@@ -161,21 +159,21 @@ Matrix::~Matrix(){
 void Matrix::transpose(){
 
     float tmp = 0;
-    float* new_data = (float*)calloc(row_count * columns_count, sizeof(float));
+    float* new_data = (float*)calloc(rows_count * columns_count, sizeof(float));
 
-    for (int i = 0; i < row_count; i++){
+    for (int i = 0; i < rows_count; i++){
 
         for (int j = 0; j < columns_count; j++){
 
-            assert(i * columns_count + j < row_count * columns_count);
+            assert(i * columns_count + j < rows_count * columns_count);
 
-            new_data[j * row_count + i] = data[i * columns_count + j];
+            new_data[j * rows_count + i] = data[i * columns_count + j];
         }
     }
 
     tmp = columns_count;
-    columns_count = row_count;
-    row_count = (int)tmp;
+    columns_count = rows_count;
+    rows_count = (int)tmp;
 
     free(data);
     data = new_data;
@@ -183,7 +181,7 @@ void Matrix::transpose(){
 
 void Matrix::print(FILE* output_stream){
 
-    for (int i = 0; i < row_count * columns_count; i++){
+    for (int i = 0; i < rows_count * columns_count; i++){
 
         fprintf(output_stream, "%f ", data[i]);
 
@@ -209,11 +207,129 @@ int Matrix::length(){
 
     if (columns_count == 1){
 
-        return max(row_count, columns_count);
+        return max(rows_count, columns_count);
     } else{
 
         return -1;
     }
+}
+
+int not_del_elem(int size, int* array){
+
+    int i_has_found = 0;
+
+    for (int i = 0; i < (size + 1); i++){
+
+        for (int j = 0; j < size; j++){
+
+            if (array[j] == i){
+
+                i_has_found = 1;
+            }
+        }        
+        
+        if (i_has_found == 0){
+
+            return i;
+        } else{
+
+            i_has_found = 0;
+        }
+    }
+
+    return -1;
+}
+
+int check_deleted(int number, int size, int* array){//если 1, то  удален
+
+    for (int i = 0; i < size; i++){
+
+        if (array[i] == number){
+
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+void print_minor(const Matrix& init_matr, int deleted_rows_count, int* deleted_columns){
+
+    for (int i = deleted_rows_count; i < init_matr.rows_count; i++){
+
+        for (int j = 0; j < init_matr.rows_count; j++){
+
+            if (check_deleted(j, deleted_rows_count, deleted_columns) == 0){
+
+                printf("%f ", init_matr[i][j]);
+            }
+        }
+
+        printf("\n");
+    }
+}
+
+float minor(const Matrix& init_matr, int deleted_rows_count, int* deleted_columns){ //можно убрать список удаленных строк тк он  последовательные
+
+    int i = deleted_rows_count, j = 0;
+    float determ = 0;
+
+    if ((deleted_rows_count + 1) != init_matr.rows_count){
+
+        while (i < init_matr.rows_count){
+            
+            assert(j < init_matr.rows_count);
+            if (check_deleted(j, deleted_rows_count, deleted_columns) == 0){//проверяем номера столбцов, которые еще не удалены, поэтому проверяем первые deleted_rows_count элементов
+
+                deleted_columns[deleted_rows_count] = j;
+
+                if ((i - deleted_rows_count) % 2 == 0){
+
+                    determ += init_matr[deleted_rows_count][j] * minor(init_matr, deleted_rows_count + 1, deleted_columns);
+                } else{
+                    
+                    determ += (-1) * init_matr[deleted_rows_count][j] * minor(init_matr, deleted_rows_count + 1, deleted_columns);
+                }
+
+                i++;
+                j++;
+            } else{
+
+                j++;
+            }
+        }
+        
+        return determ;
+    } else{
+
+        assert(not_del_elem(deleted_rows_count, deleted_columns) != -1);
+        return init_matr[deleted_rows_count][not_del_elem(deleted_rows_count, deleted_columns)];
+    }
+}
+
+float Matrix::determinant(){
+
+    assert(rows_count == columns_count);
+
+    float determ = 0;
+
+    int* deleted_columns = (int*)calloc(columns_count, sizeof(int));
+
+    for (int i = 0; i < rows_count; i++){ //разложение по первой строчке
+
+        deleted_columns[0] = i;
+        
+        if ((i % 2) == 0){
+            
+            determ += data[i] * minor(*this, 1, deleted_columns);
+        } else{
+
+            determ += (-1) * data[i] * minor(*this, 1, deleted_columns);
+        }
+    }
+
+    free(deleted_columns);
+    return determ;
 }
 
 Matrix& Matrix::operator = (const Matrix& rv){
@@ -225,12 +341,12 @@ Matrix& Matrix::operator = (const Matrix& rv){
         return *this;
     }
         
-    data = (float*)calloc(rv.row_count * rv.columns_count, sizeof(float));
+    data = (float*)calloc(rv.rows_count * rv.columns_count, sizeof(float));
     
-    row_count = rv.row_count;
+    rows_count = rv.rows_count;
     columns_count = rv.columns_count;
 
-    memcpy(data, rv.data, row_count * columns_count * sizeof(float));
+    memcpy(data, rv.data, rows_count * columns_count * sizeof(float));
 
     return *this;
 }
@@ -240,38 +356,107 @@ Matrix& Matrix::operator = (Matrix&& rv){
     printf("Оператор присваивания перемещения lvalue = rvalue\n\n");
 
     data = rv.data;
-    row_count = rv.row_count;
+    rows_count = rv.rows_count;
     columns_count = rv.columns_count;
 
     rv.data = NULL;
-    rv.row_count = 0;
+    rv.rows_count = 0;
     rv.columns_count = 0;
 
     return *this;
 }
 
-float* Matrix::operator [] (int row_number){
+float* Matrix::operator [] (const int row_number){
 
-    assert(row_number < row_count);
+    assert(row_number < rows_count);
     return &data[row_number * columns_count];
+}
+
+const float* Matrix::operator [] (const int row_number) const{
+
+    assert(row_number < rows_count);
+    return &data[row_number * columns_count];
+}
+
+Matrix operator * (const Matrix& L_matr, const Matrix& R_matr){
+
+    assert(L_matr.columns_count == R_matr.rows_count);
+
+    Matrix tmp_obj(R_matr.columns_count, L_matr.rows_count, (float)0);
+
+    for (int i = 0; i < L_matr.rows_count; i++){
+
+        for (int j = 0; j < R_matr.columns_count; j++){
+
+            for (int k = 0; k < L_matr.columns_count; k++){
+
+                tmp_obj[i][j] += L_matr[i][k] * R_matr[k][j];
+            }
+        }
+    }
+
+    return static_cast<Matrix&&>(tmp_obj); 
 }
 
 Matrix operator + (const Matrix& L_matr, const Matrix& R_matr){
 
     printf("Оператор +\n\n");
 
-    assert((L_matr.row_count == R_matr.row_count) && (L_matr.columns_count == R_matr.columns_count));
+    assert((L_matr.rows_count == R_matr.rows_count) && (L_matr.columns_count == R_matr.columns_count));
 
-    float* new_data = (float*)calloc(L_matr.row_count * L_matr.columns_count, sizeof(float));
+    float* new_data = (float*)calloc(L_matr.rows_count * L_matr.columns_count, sizeof(float));
 
-    for (int i = 0; i < L_matr.row_count * L_matr.columns_count; i++){
+    for (int i = 0; i < L_matr.rows_count * L_matr.columns_count; i++){
 
         new_data[i] = L_matr.data[i] + R_matr.data[i];
     }
 
-    Matrix tmp_obj(L_matr.columns_count, L_matr.row_count, new_data);
+    Matrix tmp_obj(L_matr.columns_count, L_matr.rows_count, new_data);
         
     free(new_data);
 
     return static_cast<Matrix&&>(tmp_obj); 
 }
+
+Matrix operator - (const Matrix& L_matr, const Matrix& R_matr){
+
+    printf("Оператор -\n\n");
+
+    assert((L_matr.rows_count == R_matr.rows_count) && (L_matr.columns_count == R_matr.columns_count));
+
+    float* new_data = (float*)calloc(L_matr.rows_count * L_matr.columns_count, sizeof(float));
+
+    for (int i = 0; i < L_matr.rows_count * L_matr.columns_count; i++){
+
+        new_data[i] = L_matr.data[i] - R_matr.data[i];
+    }
+
+    Matrix tmp_obj(L_matr.columns_count, L_matr.rows_count, new_data);
+        
+    free(new_data);
+
+    return static_cast<Matrix&&>(tmp_obj); 
+}
+
+int same_size(const Matrix& L_matr, const Matrix& R_matr){
+
+    if ((L_matr.rows_count == R_matr.rows_count) && (L_matr.columns_count == R_matr.columns_count)){
+
+        return 1;
+    } else{
+
+        return 0;
+    }
+}
+
+int could_be_mult(const Matrix& L_matr, const Matrix& R_matr){
+
+    if (L_matr.columns_count == R_matr.rows_count){
+
+        return 1;
+    } else{
+
+        return 0;
+    }
+}
+

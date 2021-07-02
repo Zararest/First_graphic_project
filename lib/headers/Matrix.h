@@ -7,7 +7,7 @@ class Matrix{
 
 private:
 
-    int row_count;
+    int rows_count;
     int columns_count;
 
     float* data;
@@ -34,13 +34,19 @@ public:
 
     int length();//+
 
-    float determinant();
+    float determinant();//+
+
+    int is_quadratic();
 
     Matrix& operator = (const Matrix& rv);//+                                         //оператор присваивания для lvalue = lvalue
 
     Matrix& operator = (Matrix&& rv);//+                                              //оператор присваивания перемещением
 
-    float* operator [] (int row_number);//+                                           //после выполения этого оператора будет еще одно обращение [](нет проверки на выход за границы)(номера строк с 0)
+    float* operator [] (const int row_number);//+                                           //после выполения этого оператора будет еще одно обращение [](нет проверки на выход за границы)(номера строк с 0)
+
+    const float* operator [] (const int row_number) const;//+                         //оператор для константных объектов класса
+
+    const Matrix& operator ^ (int degree);
 
     friend Matrix operator * (const Matrix& L_matr, const Matrix& R_matr);
 
@@ -50,8 +56,14 @@ public:
  
     friend Matrix operator + (const Matrix& L_matr, const Matrix& R_matr);//+         //если не совпадают размеры, то ассерт
 
-    friend Matrix operator - (const Matrix& L_matr, const Matrix& R_matr);    
+    friend Matrix operator - (const Matrix& L_matr, const Matrix& R_matr);//+    
 
-    friend int same_size(const Matrix& L_matr, const Matrix& R_matr);    
+    friend int same_size(const Matrix& L_matr, const Matrix& R_matr);//+   
+
+    friend int could_be_mult(const Matrix& L_matr, const Matrix& R_matr);//+
+
+    friend float minor(const Matrix& init_matr, int deleted_rows_count, int* deleted_columns);//+
+
+    friend void print_minor(const Matrix& init_matr, int deleted_rows_count, int* deleted_columns);//+
 };
 
