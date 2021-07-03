@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <cassert>
 #include <string.h>
+#include <math.h>
 
 class Matrix{
 
@@ -16,9 +17,9 @@ private:
 
 public:
 
-    Matrix(int horizontal_size, int vertical_size, float* numbers);//+
+    Matrix(int vertical_size, int horizontal_size, float* numbers);//+
 
-    Matrix(int horizonlal_size, int vertical_size, float diag_elem);//+              //диагональная матрица с элементом diag_elem
+    Matrix(int vertical_size, int horizontal_size, float diag_elem);//+              //диагональная матрица с элементом diag_elem
 
     Matrix(FILE* input);//+
 
@@ -36,7 +37,7 @@ public:
 
     float determinant();//+
 
-    int is_quadratic();
+    int is_quadratic();//+
 
     Matrix& operator = (const Matrix& rv);//+                                         //оператор присваивания для lvalue = lvalue
 
@@ -46,17 +47,19 @@ public:
 
     const float* operator [] (const int row_number) const;//+                         //оператор для константных объектов класса
 
-    const Matrix& operator ^ (int degree);
+    Matrix operator ^ (char degree);//+                                           //можно дописать обратную матрицу через знак -
 
-    friend Matrix operator * (const Matrix& L_matr, const Matrix& R_matr);
+    friend Matrix operator * (const Matrix& L_matr, const Matrix& R_matr);//+
 
-    friend Matrix operator * (const Matrix& L_matr, int number);
+    friend Matrix operator * (const Matrix& matr, int number);//+
 
-    friend Matrix operator * (int number, const Matrix& R_matr);
+    friend Matrix operator * (int number, const Matrix& matr);//+
  
     friend Matrix operator + (const Matrix& L_matr, const Matrix& R_matr);//+         //если не совпадают размеры, то ассерт
 
     friend Matrix operator - (const Matrix& L_matr, const Matrix& R_matr);//+    
+
+    friend float cos(const Matrix& L_matr, const Matrix& R_matr);//+
 
     friend int same_size(const Matrix& L_matr, const Matrix& R_matr);//+   
 

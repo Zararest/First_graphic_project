@@ -2,28 +2,43 @@
 
 //g++ main.o -o main -lsfml-graphics -lsfml-window -lsfml-system
 
-void function(Matrix& func_obj){
-
-    printf("вызов функции\n\n");
-
-    printf("obj_3[0][0] = %f\n\n", func_obj[0][2]);
-
-    //func_obj[0][0] = 1.5;
-}
+#include <ctime>
 
 int main(){ //const Matrix& это rvalue, поэтому с ним возникают проблемы
 
     FILE* input = fopen("matrix.txt", "r");
     FILE* input_2 = fopen("matrix_2.txt", "r");
+    FILE* input_3 = fopen("matrix_3.txt", "r");
+    float* arr = (float*)calloc(8, sizeof(float));
 
+    for (int i = 0; i < 8; i++){
+        
+        fscanf(input_3, "%f", &arr[i]);
+    }
+    
     Matrix obj_1(input);
-    Matrix obj_2(input_2);
-    Matrix obj_3(1, 1, (float)0);
+    Matrix* arr_of_matr = (Matrix*)calloc(10000006, sizeof(Matrix));
+    
+    assert(arr_of_matr != NULL);
 
-    obj_3 = obj_1 * obj_2;
+    printf("sizof(Matrix) = %li\n", sizeof(Matrix));
 
-    obj_3.print(stdout);
+    long unsigned int start_time =  clock(); 
+    for (int i = 0; i < 10000000; i++){
 
+        printf("i = %i\n", i);
+        if (i % 2 == 0){
+
+            arr_of_matr[i] =  (obj_1^'T') * obj_1;
+        } else{
+
+            arr_of_matr[9999999 - i] =  (obj_1^'T') * obj_1;
+        }
+    }
+    long unsigned int end_time =  clock(); 
+
+    printf("time = %li\n", end_time - start_time);
     fclose(input);
     fclose(input_2);
+    fclose(input_3);
 }

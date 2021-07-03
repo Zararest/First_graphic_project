@@ -1,8 +1,10 @@
 #include "headers/Matrix.h"
 
-Matrix::Matrix(int horizontal_size, int vertical_size, float* numbers){//копирует данные из массива
+Matrix::Matrix(int vertical_size, int horizontal_size, float* numbers){//копирует данные из массива
 
-    printf("Конструктор матрицы по массиву\n\n");
+    //printf("Конструктор матрицы по массиву\n\n");
+
+    assert((vertical_size >= 0) && (horizontal_size >= 0));
 
     if (numbers != NULL){
 
@@ -24,9 +26,11 @@ Matrix::Matrix(int horizontal_size, int vertical_size, float* numbers){//коп�
     }
 }
 
-Matrix::Matrix(int horizontal_size, int vertical_size, float diag_elem){//заполняет таблицу нулями и если матрица квадратная, то диагональ это diag_elem
+Matrix::Matrix(int vertical_size, int horizontal_size, float diag_elem){//заполняет таблицу нулями и если матрица квадратная, то диагональ это diag_elem
 
-    printf("Конструктор диагональной матрицы\n\n");
+    //printf("Конструктор диагональной матрицы\n\n");
+
+    assert((vertical_size >= 0) && (horizontal_size >= 0));
 
     if (horizontal_size * vertical_size != 0){
 
@@ -78,7 +82,7 @@ char my_getc(FILE* input){
 
 Matrix::Matrix(FILE* input){
 
-    printf("Конструктор по файлу\n\n");
+    //printf("Конструктор по файлу\n\n");
 
     int cur_size = 0, tmp_columns_count = 0;
     char next_symbol = '\0';
@@ -121,7 +125,7 @@ Matrix::Matrix(FILE* input){
 
 Matrix::Matrix(const Matrix& old_obj){
 
-    printf("Конструктор глубокого копирования\n\n");
+    //printf("Конструктор глубокого копирования\n\n");
 
     data = (float*)calloc(old_obj.rows_count * old_obj.columns_count, sizeof(float));
 
@@ -133,7 +137,7 @@ Matrix::Matrix(const Matrix& old_obj){
 
 Matrix::Matrix(Matrix&& old_obj){
 
-    printf("Конструктор перемещения\n\n");
+    //printf("Конструктор перемещения\n\n");
 
     data = old_obj.data;
     rows_count = old_obj.rows_count;
@@ -146,7 +150,7 @@ Matrix::Matrix(Matrix&& old_obj){
 
 Matrix::~Matrix(){
 
-    printf("Деструктор\n\n");
+    //printf("Деструктор\n\n");
 
     if (data != NULL){
 
@@ -158,25 +162,34 @@ Matrix::~Matrix(){
 
 void Matrix::transpose(){
 
-    float tmp = 0;
-    float* new_data = (float*)calloc(rows_count * columns_count, sizeof(float));
+    int tmp = 0;
 
-    for (int i = 0; i < rows_count; i++){
+    if ((rows_count == 1) || (columns_count == 1)){
 
-        for (int j = 0; j < columns_count; j++){
+        tmp = rows_count;
+        rows_count = columns_count;
+        columns_count  = tmp;
+    } else{
 
-            assert(i * columns_count + j < rows_count * columns_count);
+        float* new_data = (float*)calloc(rows_count * columns_count, sizeof(float));
 
-            new_data[j * rows_count + i] = data[i * columns_count + j];
+        for (int i = 0; i < rows_count; i++){
+
+            for (int j = 0; j < columns_count; j++){
+
+                assert(i * columns_count + j < rows_count * columns_count);
+
+                new_data[j * rows_count + i] = data[i * columns_count + j];
+            }
         }
+
+        tmp = columns_count;
+        columns_count = rows_count;
+        rows_count = tmp;
+
+        free(data);
+        data = new_data;
     }
-
-    tmp = columns_count;
-    columns_count = rows_count;
-    rows_count = (int)tmp;
-
-    free(data);
-    data = new_data;
 }
 
 void Matrix::print(FILE* output_stream){
@@ -332,9 +345,20 @@ float Matrix::determinant(){
     return determ;
 }
 
+int Matrix::is_quadratic(){
+
+    if (rows_count == columns_count){
+
+        return 1;
+    } else{
+
+        return 0;
+    }
+}
+
 Matrix& Matrix::operator = (const Matrix& rv){
 
-    printf("Оператор присваивания lvalue = lvalue\n\n");
+    //printf("Оператор присваивания lvalue = lvalue\n\n");
 
     if (this == &rv){
 
@@ -353,7 +377,7 @@ Matrix& Matrix::operator = (const Matrix& rv){
 
 Matrix& Matrix::operator = (Matrix&& rv){
 
-    printf("Оператор присваивания перемещения lvalue = rvalue\n\n");
+    //printf("Оператор присваивания перемещения lvalue = rvalue\n\n");
 
     data = rv.data;
     rows_count = rv.rows_count;
@@ -378,11 +402,50 @@ const float* Matrix::operator [] (const int row_number) const{
     return &data[row_number * columns_count];
 }
 
+Matrix Matrix::operator ^ (char degree){
+
+    //printf("Оператор ^\n\n");
+
+    int tmp = 0;
+
+    if ((rows_count == 0) || (columns_count == 0)){
+
+        Matrix tmp_obj(0, 0, (float)0);
+
+        return static_cast<Matrix&&>(tmp_obj);
+    }
+
+    if ((rows_count == 1) || (columns_count == 1)){
+
+        Matrix tmp_obj(columns_count, rows_count, data);
+
+        return static_cast<Matrix&&>(tmp_obj);
+    } else{
+
+        Matrix tmp_obj(columns_count, rows_count, (float) 0);
+
+        for (int i = 0; i < rows_count; i++){
+
+            for (int j = 0; j < columns_count; j++){
+
+                assert(i * columns_count + j < rows_count * columns_count);
+
+                tmp_obj.data[j * rows_count + i] = data[i * columns_count + j];
+            }
+        }
+
+        return static_cast<Matrix&&>(tmp_obj);
+    }
+
+}
+
 Matrix operator * (const Matrix& L_matr, const Matrix& R_matr){
+
+    //printf("Оператор *\n\n");
 
     assert(L_matr.columns_count == R_matr.rows_count);
 
-    Matrix tmp_obj(R_matr.columns_count, L_matr.rows_count, (float)0);
+    Matrix tmp_obj(L_matr.rows_count, R_matr.columns_count, (float)0);
 
     for (int i = 0; i < L_matr.rows_count; i++){
 
@@ -398,9 +461,30 @@ Matrix operator * (const Matrix& L_matr, const Matrix& R_matr){
     return static_cast<Matrix&&>(tmp_obj); 
 }
 
+Matrix operator * (int number, const Matrix& matr){
+
+    //rintf("Оператор число * матрица\n\n");
+
+    Matrix tmp_obj(matr.rows_count, matr.columns_count, (float)0);
+
+    for (int i = 0; i < matr.rows_count * matr.columns_count; i++){
+
+        tmp_obj.data[i] = matr.data[i] * number;
+    }
+
+    return static_cast<Matrix&&>(tmp_obj);
+}
+
+Matrix operator * (const Matrix& matr, int number){
+
+    //printf("Оператор матрица * число\n\n");
+
+    return number * matr;
+}
+
 Matrix operator + (const Matrix& L_matr, const Matrix& R_matr){
 
-    printf("Оператор +\n\n");
+    //printf("Оператор +\n\n");
 
     assert((L_matr.rows_count == R_matr.rows_count) && (L_matr.columns_count == R_matr.columns_count));
 
@@ -411,7 +495,7 @@ Matrix operator + (const Matrix& L_matr, const Matrix& R_matr){
         new_data[i] = L_matr.data[i] + R_matr.data[i];
     }
 
-    Matrix tmp_obj(L_matr.columns_count, L_matr.rows_count, new_data);
+    Matrix tmp_obj(L_matr.rows_count, L_matr.columns_count, new_data);
         
     free(new_data);
 
@@ -420,7 +504,7 @@ Matrix operator + (const Matrix& L_matr, const Matrix& R_matr){
 
 Matrix operator - (const Matrix& L_matr, const Matrix& R_matr){
 
-    printf("Оператор -\n\n");
+    //printf("Оператор -\n\n");
 
     assert((L_matr.rows_count == R_matr.rows_count) && (L_matr.columns_count == R_matr.columns_count));
 
@@ -431,11 +515,36 @@ Matrix operator - (const Matrix& L_matr, const Matrix& R_matr){
         new_data[i] = L_matr.data[i] - R_matr.data[i];
     }
 
-    Matrix tmp_obj(L_matr.columns_count, L_matr.rows_count, new_data);
+    Matrix tmp_obj(L_matr.rows_count, L_matr.columns_count, new_data);
         
     free(new_data);
 
     return static_cast<Matrix&&>(tmp_obj); 
+}
+
+float cos(const Matrix& L_matr, const Matrix& R_matr){
+
+    //printf("Косинус\n\n");
+
+    assert((L_matr.columns_count == 1) && (R_matr.columns_count == 1));
+    assert((R_matr.rows_count == L_matr.rows_count));
+
+    float scalar_mult = 0, L_abs = 0, R_abs = 0;
+    
+    for(int i = 0; i < L_matr.rows_count; i++){
+
+        scalar_mult += L_matr.data[i] * R_matr.data[i];
+        L_abs += L_matr.data[i] * L_matr.data[i];
+        R_abs += R_matr.data[i] * R_matr.data[i];
+    }
+    
+    if (L_abs * R_abs == 0){
+
+        return 2;
+    } else{
+
+        return (scalar_mult / sqrt(L_abs * R_abs));
+    }
 }
 
 int same_size(const Matrix& L_matr, const Matrix& R_matr){
