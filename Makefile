@@ -7,6 +7,16 @@ main.o: main.cpp
 Matrix.o: lib/Matrix.cpp
 	g++ -c lib/Matrix.cpp
 
+Object.o: lib/Object.cpp lib/Matrix.cpp lib/Point.cpp
+	g++ -c lib/Object.cpp lib/Matrix.cpp lib/Point.cpp
+
+
+test: lib/Object.cpp lib/Matrix.cpp lib/Point.cpp test.cpp lib/Sphere.cpp lib/Flatness.cpp
+	g++ lib/Object.cpp lib/Matrix.cpp lib/Point.cpp test.cpp lib/Sphere.cpp lib/Flatness.cpp -o test
+
+
+
 .PHONY : clean
 clean:
 	rm -rf *.o main
+	rm -rf *.o test

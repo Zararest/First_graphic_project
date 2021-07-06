@@ -1,8 +1,13 @@
+#ifndef MATRIX_H
+#define MATRIX_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <cassert>
 #include <string.h>
 #include <math.h>
+
+char my_getc(FILE* input);
 
 class Matrix{
 
@@ -70,3 +75,4 @@ public:
     friend void print_minor(const Matrix& init_matr, int deleted_rows_count, int* deleted_columns);//+
 };
 
+#endif

@@ -1,4 +1,6 @@
 matrix_2.txt
 matrix_3.txt
+test.cpp
+test
 *.o
 main

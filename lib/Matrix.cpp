@@ -62,6 +62,11 @@ char my_getc(FILE* input){
     char c = '\0';
     int count = 0;
 
+    if (input == NULL){
+        
+        return EOF;
+    }
+
     while (((c = getc(input)) == ' ') || (c == '\t')){
         
         count++;
@@ -70,7 +75,9 @@ char my_getc(FILE* input){
     if (count != 0){
 
         fseek(input, -1, SEEK_CUR);
-    } 
+    }
+
+    //fseek(input, -1, SEEK_CUR);
     
     if (c == EOF){
 
@@ -150,7 +157,7 @@ Matrix::Matrix(Matrix&& old_obj){
 
 Matrix::~Matrix(){
 
-    //printf("Деструктор\n\n");
+    printf("Деструктор\n\n");
 
     if (data != NULL){
 
@@ -378,7 +385,7 @@ Matrix& Matrix::operator = (const Matrix& rv){
 Matrix& Matrix::operator = (Matrix&& rv){
 
     //printf("Оператор присваивания перемещения lvalue = rvalue\n\n");
-
+    free(data);   //вроде без этого утечка памяти
     data = rv.data;
     rows_count = rv.rows_count;
     columns_count = rv.columns_count;

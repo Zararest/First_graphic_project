@@ -1,44 +1,43 @@
 #include "lib/headers/Matrix.h"
-
+#include "lib/headers/Physical space.h"
 //g++ main.o -o main -lsfml-graphics -lsfml-window -lsfml-system
 
-#include <ctime>
+
+void func(){//примерная работа с движками
+
+    FILE* input = fopen("space.txt", "r");
+    float delta_t = 2;
+
+    Space cur_space(input);
+    Physics_engine phys_eng(cur_space, delta_t);
+    //Rendering_engine rend_eng(cur_space);
+
+    //открываем окно
+
+    //Движок коллизий(окно)
+
+    //цикл пока окно не закрыто
+
+        //проверка на нажатие нужной кнопки, чтобы поставить на паузу и возможно что-то исправить
+
+        //считывание клавиш для движения
+
+        //сначала коллизии потом силы
+
+    //после закрытия окна надо спросить нужна ли запись положения частиц в файл 
+}
+
+void debug_mode(Space& func_space, Rendering_engine& func_eng){
+
+    //функция что-то исправить 
+
+    //обрабатывает нажатия кнопок(при дебаге можно переключаться между перемещением по кадру и по пространству)
+    //после наведения курсора(скорее всего точка на экране, перемещающаяся с помощью кнопок) ищем пересечение с первым попавшемся объектом 
+    //выбрав первый объект, начинаем двигать его с помощью кнопок (можно вывести в консоль информацию об объекте)
+    //с помощью консоли можно редактировать параметры объекта 
+}
 
 int main(){ //const Matrix& это rvalue, поэтому с ним возникают проблемы
 
-    FILE* input = fopen("matrix.txt", "r");
-    FILE* input_2 = fopen("matrix_2.txt", "r");
-    FILE* input_3 = fopen("matrix_3.txt", "r");
-    float* arr = (float*)calloc(8, sizeof(float));
 
-    for (int i = 0; i < 8; i++){
-        
-        fscanf(input_3, "%f", &arr[i]);
-    }
-    
-    Matrix obj_1(input);
-    Matrix* arr_of_matr = (Matrix*)calloc(10000006, sizeof(Matrix));
-    
-    assert(arr_of_matr != NULL);
-
-    printf("sizof(Matrix) = %li\n", sizeof(Matrix));
-
-    long unsigned int start_time =  clock(); 
-    for (int i = 0; i < 10000000; i++){
-
-        printf("i = %i\n", i);
-        if (i % 2 == 0){
-
-            arr_of_matr[i] =  (obj_1^'T') * obj_1;
-        } else{
-
-            arr_of_matr[9999999 - i] =  (obj_1^'T') * obj_1;
-        }
-    }
-    long unsigned int end_time =  clock(); 
-
-    printf("time = %li\n", end_time - start_time);
-    fclose(input);
-    fclose(input_2);
-    fclose(input_3);
 }
