@@ -12,6 +12,12 @@
 
 void go_to_end_of_line(FILE* file);
 
+char fgetc_without_space(FILE* input_file);
+
+Matrix get_vector(FILE* input_file);
+
+Point get_point(FILE* input_file);
+
 //-----------------------------------------------------------
 class Object{
 

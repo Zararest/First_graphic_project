@@ -75,7 +75,7 @@ public:
 
     friend float distance(Point& fir_point, Point& sec_point);
 
-    friend Point get_base_point(FILE* input_file);
+    friend Point get_point(FILE* input_file);
     
     friend class Sphere;
 

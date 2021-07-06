@@ -1,37 +1,5 @@
 #include "headers/Objects.h"
 
-Point get_base_point(FILE* input_file){
-
-    float tmp[3] = {0, 0, 0};
-    Point tmp_obj;
-
-    for (int i = 0; i < 3; i++){
-
-        if (fscanf(input_file, "%f", &tmp[i]) <= 0){
-
-            printf("Incorrect bounding 4 points in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        }
-    }
-
-    if (my_getc(input_file) != ')'){
-
-        printf("Incorrect bounding points 5 in file[%ld]\n", ftell(input_file));
-        go_to_end_of_line(input_file);
-    }
-
-    if (fgetc(input_file) != ')'){
-
-        fseek(input_file, -1, SEEK_CUR);
-    }
-
-    tmp_obj.x = tmp[0];
-    tmp_obj.y = tmp[1];
-    tmp_obj.z = tmp[2];
-
-    return static_cast<Point&&>(tmp_obj);
-}
-
 Flatness::Flatness(FILE* input_file):
 
     Object(),
@@ -41,7 +9,7 @@ Flatness::Flatness(FILE* input_file):
 {
     bounding_points = NULL;
     phys_param = NULL;
-
+    
     if (input_file  != NULL){
 
         float vector_data[3] = {0, 0, 0};
@@ -49,114 +17,30 @@ Flatness::Flatness(FILE* input_file):
         int counter = 0;
         char c = '\0';
 
-        if (my_getc(input_file) != '{'){
+        normal = get_vector(input_file);
 
-            printf("Incorrect normal vector data in file[%ld]\n", ftell(input_file));
+        base_point = get_point(input_file);
+
+        if (fgetc_without_space(input_file) != '{'){
+
+            printf("Incorrect bounding points in file[%ld](can't find '{')\n",  ftell(input_file));
             go_to_end_of_line(input_file);
-        } else{
+        }
 
-            c = fgetc(input_file);
-            
-            if (c != '{'){
+        if ((c = fgetc_without_space(input_file)) == '('){
+
+            fseek(input_file, -1, SEEK_CUR);
+            counter++;
+            bounding_points = (Point*)realloc(bounding_points, counter * sizeof(Point));
+            bounding_points[counter - 1] = get_point(input_file);
+
+            while (((c = fgetc_without_space(input_file)) != '}') && (c != '|') && (c != EOF) && (c != '\n')){
 
                 fseek(input_file, -1, SEEK_CUR);
-            }
-        }
-
-        for (int i = 0; i < 3; i++){
-
-            if (fscanf(input_file, "%f", &vector_data[i]) <= 0){
-
-                printf("Incorrect normal vector data in file[%ld]\n", ftell(input_file));
-                go_to_end_of_line(input_file);
-            }
-        }
-        normal[0][0] = vector_data[0];
-        normal[1][0] = vector_data[1];
-        normal[2][0] = vector_data[2];
-
-        if (my_getc(input_file) != '}'){
-
-            printf("Incorrect normal vector data in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        } else{
-
-            fgetc(input_file);
-        }
-
-
-        if (my_getc(input_file) != '{'){
-
-            printf("Incorrect point data in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        } else{
-
-            c = fgetc(input_file);
-            
-            if (c != '{'){
-
-                fseek(input_file, -1, SEEK_CUR);
-            }
-        }
-
-        for (int i = 0; i < 3; i++){
-
-            if (fscanf(input_file, "%f", &vector_data[i]) <= 0){
-
-                printf("Incorrect point data in file[%ld]\n", ftell(input_file));
-                go_to_end_of_line(input_file);
-            }
-        }
-        base_point.x = vector_data[0];
-        base_point.y = vector_data[1];
-        base_point.z = vector_data[2];
-
-        if (my_getc(input_file) != '}'){
-
-            printf("Incorrect point data in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        } else{
-
-            fgetc(input_file);
-        }
-
-
-        if (my_getc(input_file) != '{'){
-
-            printf("Incorrect bounding points 1 in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        } else{
-
-            c = fgetc(input_file);
-            
-            if (c != '{'){
-
-                fseek(input_file, -1, SEEK_CUR);
-            }
-        }
-
-        while (((c = my_getc(input_file)) != '}') && (c != '|') && (c != '\n')){
-            
-            c = fgetc(input_file);
-
-            if (c != '('){
-
-                fseek(input_file, -1, SEEK_CUR);
-            }
-
-            if (c == '('){
-
                 counter++;
                 bounding_points = (Point*)realloc(bounding_points, counter * sizeof(Point));
-                bounding_points[counter - 1] = get_base_point(input_file);
-            } else{
-
-                printf("Incorrect bounding 2 points in file[%ld]\n", ftell(input_file));
-                go_to_end_of_line(input_file);
+                bounding_points[counter - 1] = get_point(input_file);
             }
-        }
-
-        if (counter != 0){
 
             bounding_points = (Point*)realloc(bounding_points, (counter + 1) * sizeof(Point));
             bounding_points[counter] = bounding_points[0];
@@ -165,63 +49,83 @@ Flatness::Flatness(FILE* input_file):
 
                 printf("Warning: too few bounding points in file[%ld]\n", ftell(input_file));
             }
-        }
-        
-        if ((c = my_getc(input_file)) != '}'){
 
-            printf("my_getc = %c\n", c);
-            printf("Incorrect bounding 3 points in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        }
+            if (c != '}'){
 
-        c = fgetc(input_file);
-
-        if (c != '}'){
-
-            fseek(input_file, -1, SEEK_CUR);
-        }  
-
-
-        if (my_getc(input_file) != '{'){
-
-            printf("Incorrect velocity data in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
+                printf("Incorrect bounding points in file[%ld](can't find '}')\n",  ftell(input_file));
+                go_to_end_of_line(input_file);
+            }
         } else{
 
-            fgetc(input_file);
-        }
-
-        for (int i = 0; i < 3; i++){
-
-            if (fscanf(input_file, "%f", &vector_data[i]) <= 0){
-
-                printf("Incorrect velocity data in file[%ld]\n", ftell(input_file));
+            if (c != '}'){
+                
+                printf("Incorrect bounding points in file[%ld](can't find '}')\n",  ftell(input_file));
                 go_to_end_of_line(input_file);
             }
         }
-        velocity[0][0] = vector_data[0];
-        velocity[1][0] = vector_data[1];
-        velocity[2][0] = vector_data[2];
 
-        if (my_getc(input_file) != '}'){
+        velocity = get_vector(input_file);
 
-            printf("Incorrect velocity data in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        } else{
+        get_object_params(input_file, *this); 
 
-            fgetc(input_file);
-        } 
-
-
-        get_object_params(input_file, *this);     
-
-        if (my_getc(input_file) != '\n'){
+        if (fgetc_without_space(input_file) != '|'){
 
             printf("Too many parameters in file[%ld]\n", ftell(input_file));
+            go_to_end_of_line(input_file);
+            fgetc(input_file);
         }
-        fgetc(input_file);
+        fgetc_without_space(input_file);
     }
-    printf("end\n");
+}
+
+Flatness::Flatness(Flatness&& old_obj):
+
+    velocity(old_obj.velocity),
+    normal(old_obj.normal),
+    base_point(old_obj.base_point)
+{
+    free(phys_param);
+    free(color);
+    free(bounding_points);
+    phys_param = old_obj.phys_param;
+    color = old_obj.color;
+    bounding_points = old_obj.bounding_points;
+
+    old_obj.phys_param = NULL;
+    old_obj.bounding_points = NULL;
+    old_obj.color = NULL;
+
+    transpendecy = old_obj.transpendecy;
+    surface = old_obj.surface;
+    number_of_param = old_obj.number_of_param;
+}
+
+Flatness::~Flatness(){
+
+}
+
+Flatness& Flatness::operator = (Flatness&& rv){
+
+    free(color);
+    transpendecy = rv.transpendecy;
+    surface = rv.surface;
+    color = rv.color;
+    number_of_param = rv.number_of_param;
+
+    free(phys_param);
+    phys_param = rv.phys_param;
+    normal = rv.normal;
+    base_point = rv.base_point;
+
+    free(bounding_points);
+    bounding_points = rv.bounding_points;
+    velocity = rv.velocity;
+
+    rv.phys_param = NULL;
+    rv.color = NULL;
+    rv.bounding_points = NULL;
+
+    return *this;
 }
 
 void Flatness::get_info(FILE* output_file){
@@ -277,10 +181,4 @@ void Flatness::get_info(FILE* output_file){
     }
     fprintf(output_file, "\n");
 }
-
-Flatness::~Flatness(){
-
-
-}
-
 

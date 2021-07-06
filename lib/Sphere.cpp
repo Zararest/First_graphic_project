@@ -14,46 +14,10 @@ Sphere::Sphere(FILE* input_file):
 
     if (input_file != NULL){
 
-        float vector_data[3] = {0, 0, 0};
         float tmp = 0;
         char c = '\0';
 
-        if (my_getc(input_file) != '{'){
-
-            printf("Incorrect centre data in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        } else{
-
-            c = fgetc(input_file);
-            
-            if (c != '{'){
-
-                fseek(input_file, -1, SEEK_CUR);
-            }
-        }
-
-        for (int i = 0; i < 3; i++){
-
-            if (fscanf(input_file, "%f", &vector_data[i]) <= 0){
-
-                printf("Incorrect centre data in file[%ld]\n", ftell(input_file));
-                go_to_end_of_line(input_file);
-            }
-        }
-        centre.x = vector_data[0];
-        centre.y = vector_data[1];
-        centre.z = vector_data[2];
-
-
-        if (my_getc(input_file) != '}'){
-
-            printf("Incorrect radius data in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        } else{
-
-            fgetc(input_file);
-        }
-
+        centre = get_point(input_file);
 
         if (fscanf(input_file, "%f", &tmp) > 0){
 
@@ -74,36 +38,7 @@ Sphere::Sphere(FILE* input_file):
             go_to_end_of_line(input_file);
         }
 
-
-        if (my_getc(input_file) != '{'){
-
-            printf("Incorrect velocity data in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        } else{
-
-            fgetc(input_file);
-        }
-
-        for (int i = 0; i < 3; i++){
-
-            if (fscanf(input_file, "%f", &vector_data[i]) <= 0){
-
-                printf("Incorrect velocity data in file[%ld]\n", ftell(input_file));
-                go_to_end_of_line(input_file);
-            }
-        }
-        velocity[0][0] = vector_data[0];
-        velocity[1][0] = vector_data[1];
-        velocity[2][0] = vector_data[2];
-
-        if (my_getc(input_file) != '}'){
-
-            printf("Incorrect velocity data in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        } else{
-
-            fgetc(input_file);
-        }
+        velocity = get_vector(input_file);
 
         if (fscanf(input_file, "%f", &tmp) > 0){
 
@@ -114,108 +49,16 @@ Sphere::Sphere(FILE* input_file):
             go_to_end_of_line(input_file);
         }
 
+        get_object_params(input_file, *this); 
 
-        if (my_getc(input_file) != '{'){
-
-            printf("Incorrect colors data in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        } else{
-
-            fgetc(input_file);
-        }    
-
-        for (int i = 0; i < 3; i++){
-
-            if (fscanf(input_file, "%i", &color[i]) <= 0){
-
-                printf("Incorrect colors data in file[%ld]\n", ftell(input_file));
-                go_to_end_of_line(input_file);
-            }
-        }
-
-        if (my_getc(input_file) != '}'){
-
-            printf("Incorrect colors data in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        } else{
-
-            fgetc(input_file);
-        } 
-
-
-        if (fscanf(input_file, "%f", &tmp) > 0){
-
-            transpendecy = tmp;
-        } else{
-
-            printf("Incorrect transpendency data in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        }
-
-
-        if (fscanf(input_file, "%f", &tmp) > 0){
-
-            surface = tmp;
-        } else{
-
-            printf("Incorrect surface data in file[%ld]\n", ftell(input_file));
-            go_to_end_of_line(input_file);
-        }
-
-
-        if (my_getc(input_file) == '|'){
-
-            fgetc(input_file);
-        } else{
-
-            if (fgetc(input_file) == '('){
-
-                int counter = 0;
-                char c = '\0';
-
-                while (((c = my_getc(input_file)) != ')') && (c != '|') && (c != '\n')){
-                    
-                    if (((c >= '0') && (c <= '9')) || (c == '-')){
-
-                        fseek(input_file, -1, SEEK_CUR);
-                    }
-
-                    if (fscanf(input_file, "%f", &tmp) > 0){
-
-                        counter++;
-                        phys_param = (float*)realloc(phys_param, counter * sizeof(float));
-                        phys_param[counter - 1] = tmp;
-                    } else{
-
-                        break;
-                    }
-                }
-                
-                number_of_param = counter;
-
-                my_getc(input_file);
-
-                if (my_getc(input_file) != '|'){
-
-                    printf("Too many parameters in file[%ld]\n", ftell(input_file));
-                    go_to_end_of_line(input_file);
-
-                    number_of_param = 0;
-                }
-                fgetc(input_file);
-
-            } else{
-
-                printf("Incorrect physical fields data in file[%ld]\n", ftell(input_file));
-            }
-        }
-        
-        if (my_getc(input_file) != '\n'){
+        if (fgetc_without_space(input_file) != '|'){
 
             printf("Too many parameters in file[%ld]\n", ftell(input_file));
+            go_to_end_of_line(input_file);
+            fgetc(input_file);
         }
-        fgetc(input_file);
-    } 
+        fgetc_without_space(input_file);
+    }
 }
 
 Sphere::Sphere(Sphere&& old_obj):
@@ -224,11 +67,18 @@ Sphere::Sphere(Sphere&& old_obj):
     centre(old_obj.centre)
 {   
     free(phys_param);
+    free(color);
     radius = old_obj.radius;
     mass = old_obj.mass;
     dissipation = old_obj.dissipation;
     phys_param = old_obj.phys_param;
+    color = old_obj.color;
+    transpendecy = old_obj.transpendecy;
+    surface = old_obj.surface;
+    number_of_param = old_obj.number_of_param;
 
+
+    old_obj.color = NULL;
     old_obj.phys_param = NULL;
     old_obj.radius = 0;
     old_obj.mass = 0;
@@ -240,8 +90,6 @@ Sphere::~Sphere(){
     radius = 0;
     mass = 0;
     dissipation = 0;
-
-    free(phys_param);
 }
 
 Sphere& Sphere::operator = (Sphere&& rv){

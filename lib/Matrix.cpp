@@ -157,7 +157,7 @@ Matrix::Matrix(Matrix&& old_obj){
 
 Matrix::~Matrix(){
 
-    printf("Деструктор\n\n");
+    //printf("Деструктор\n\n");
 
     if (data != NULL){
 
