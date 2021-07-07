@@ -11,8 +11,8 @@ Object.o: lib/Object.cpp lib/Matrix.cpp lib/Point.cpp
 	g++ -c lib/Object.cpp lib/Matrix.cpp lib/Point.cpp
 
 
-test: lib/Object.cpp lib/Matrix.cpp lib/Point.cpp test.cpp lib/Sphere.cpp lib/Flatness.cpp
-	g++ lib/Object.cpp lib/Matrix.cpp lib/Point.cpp test.cpp lib/Sphere.cpp lib/Flatness.cpp -o test
+test: lib/Object.cpp lib/Matrix.cpp lib/Point.cpp test.cpp lib/Sphere.cpp lib/Flatness.cpp lib/Space.cpp lib/Elastic_interaction.cpp
+	g++ lib/Object.cpp lib/Matrix.cpp lib/Point.cpp test.cpp lib/Sphere.cpp lib/Flatness.cpp lib/Space.cpp lib/Elastic_interaction.cpp -o test
 
 
 

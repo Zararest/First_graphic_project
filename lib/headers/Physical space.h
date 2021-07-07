@@ -3,15 +3,44 @@
 
 #include "Objects.h"
 
-typedef struct struct_elastic_inter{
 
-    const Sphere& fir_obj;
-    const Sphere& sec_obj;
+//-----------------------------------------------------------
+class Field{
+
+public:
+
+    Matrix return_force(Sphere& cur_obj); //возвращает силу
+};
+//-----------------------------------------------------------
+
+//-----------------------------------------------------------
+class Elastic_interaction{
+
+private:
+
+    Sphere* fir_obj;
+    Sphere* sec_obj;
 
     float koef_k;
     float normal_distance;
 
-} elastic_interaction;
+public:
+
+    Elastic_interaction(FILE* input_file, Sphere* array_of_spheres, int number_of_spheres);
+
+    Elastic_interaction(const Elastic_interaction& old_obj) = delete;
+
+    Elastic_interaction(Elastic_interaction&& old_obj);
+
+    ~Elastic_interaction();
+    
+    Elastic_interaction& operator = (Elastic_interaction&& rv);
+
+    Elastic_interaction& operator = (const Elastic_interaction&) = delete;
+
+    void get_info(FILE* output_file);
+};
+//-----------------------------------------------------------
 
 //-----------------------------------------------------------
 class Space{
@@ -22,25 +51,22 @@ private:
 
     Flatness* array_of_flats;
     
-    elastic_interaction* arr_elastic_inter;
+    Elastic_interaction* arr_elastic_inter;
 
     Field* phys_fields;   //массив полей (руками прописываем поля в конструкторе)
 
     int number_of_spheres;
-
     int number_of_flats;
-
-    int number_of_param;
-
-    int number_of_fields;
-
     int number_of_elastic_inter;
+    int number_of_fields;
 
 public:
 
     Space(FILE* input_file);        //в файле описаны характеристики сфер, плоскостей и взаимодействий
 
     Space(const Space&) = delete;
+
+    Space(Space&&) = delete;
 
     Space& operator = (Space&&) = delete;
 
@@ -116,16 +142,6 @@ public:
     void sphere_sphere_collis(Sphere& fir_sphere, Sphere& sec_sphere);
 
     void flat_sphere_collis(Flatness& cur_flat, Sphere& cur_sphere);
-};
-//-----------------------------------------------------------
-
-
-//-----------------------------------------------------------
-class Field{
-
-public:
-
-    Matrix return_force(Sphere& cur_obj); //возвращает силу
 };
 //-----------------------------------------------------------
 

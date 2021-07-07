@@ -8,7 +8,6 @@ Flatness::Flatness(FILE* input_file):
     velocity(3, 1, (float)0)
 {
     bounding_points = NULL;
-    phys_param = NULL;
     
     if (input_file  != NULL){
 

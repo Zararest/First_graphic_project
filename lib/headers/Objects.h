@@ -81,7 +81,9 @@ public:
 
     //float illumination(const Matrix& ray_light, int light_number);
 
-    void get_info(FILE*);
+    void get_info(FILE* output_file);
+
+    friend class Elastic_interaction;
 };
 //-----------------------------------------------------------
 
