@@ -2,6 +2,7 @@
 
 Elastic_interaction::Elastic_interaction(FILE* input_file, Sphere* array_of_spheres, int number_of_spheres){
 
+    
     Point fir_tmp = get_point(input_file);
     Point sec_tmp = get_point(input_file);
     float tmp = 0;
@@ -49,6 +50,7 @@ Elastic_interaction::Elastic_interaction(FILE* input_file, Sphere* array_of_sphe
 
             if (array_of_spheres[i].centre == fir_tmp){
 
+                printf("here\n");
                 sphere_has_def++;
 
                 fir_obj = &array_of_spheres[i];
@@ -68,7 +70,7 @@ Elastic_interaction::Elastic_interaction(FILE* input_file, Sphere* array_of_sphe
             fir_tmp.print(stdout);
             printf("\n");
         }
-
+        
         sphere_has_def = 0;
 
         for (int i = 0; i < number_of_spheres; i++){
@@ -113,6 +115,7 @@ Elastic_interaction::~Elastic_interaction(){
 
     fir_obj = NULL;
     sec_obj = NULL;
+    printf("Деструктор elastic\n");
 }
 
 Elastic_interaction& Elastic_interaction::operator = (Elastic_interaction&& rv){
@@ -135,6 +138,6 @@ void Elastic_interaction::get_info(FILE* output_file){
     sec_obj->centre.print(output_file);
     fprintf(output_file, "\n");
     fprintf(output_file, "\tinteraction coefficient = %f\n", koef_k);
-    fprintf(output_file, "normal distance = %f\n", normal_distance);
+    fprintf(output_file, "\tnormal distance = %f\n", normal_distance);
     fprintf(output_file, "\n");
 }

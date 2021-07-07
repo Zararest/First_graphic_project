@@ -90,6 +90,7 @@ Sphere::~Sphere(){
     radius = 0;
     mass = 0;
     dissipation = 0;
+    printf("Деструктор sphere\n");
 }
 
 Sphere& Sphere::operator = (Sphere&& rv){

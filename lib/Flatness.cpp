@@ -101,6 +101,7 @@ Flatness::Flatness(Flatness&& old_obj):
 
 Flatness::~Flatness(){
 
+    printf("Деструктор flatness\n");
 }
 
 Flatness& Flatness::operator = (Flatness&& rv){

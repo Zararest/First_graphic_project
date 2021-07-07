@@ -39,6 +39,8 @@ public:
     Elastic_interaction& operator = (const Elastic_interaction&) = delete;
 
     void get_info(FILE* output_file);
+
+    friend int scan_elastic_inter(FILE* input_file, Elastic_interaction*& arr_elastic_inter, Sphere* array_of_spheres, int num_sphers);
 };
 //-----------------------------------------------------------
 
@@ -73,6 +75,8 @@ public:
     Space& operator = (const Space&) = delete;
 
     ~Space();
+
+    void get_info(FILE* output_file);
 
     friend class Field;
 
