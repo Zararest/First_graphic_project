@@ -104,6 +104,13 @@ Flatness::~Flatness(){
     printf("Деструктор flatness\n");
 }
 
+void Flatness::shift(float delta_t){
+
+    base_point.x += velocity[0][0] * delta_t;
+    base_point.y += velocity[1][0] * delta_t;
+    base_point.z += velocity[2][0] * delta_t;
+}
+
 Flatness& Flatness::operator = (Flatness&& rv){
 
     free(color);

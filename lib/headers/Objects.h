@@ -9,6 +9,8 @@
 #include "Matrix.h"
 #include "Point.h"
 
+class Sphere;
+class Flatness;
 
 void go_to_end_of_line(FILE* file);
 
@@ -17,6 +19,16 @@ char fgetc_without_space(FILE* input_file);
 Matrix get_vector(FILE* input_file);
 
 Point get_point(FILE* input_file);
+
+float distance(Flatness& flat, Point& point);
+
+Matrix create_vector(const Point& fir_point, const Point& sec_point);
+
+float get_koef_D(Point& point, Flatness& flat);
+
+float projection(Matrix& vector, Matrix&  axis);
+
+float distance(Flatness& flat, Point& point);
 
 //-----------------------------------------------------------
 class Object{
@@ -72,6 +84,8 @@ public:
     Sphere(Sphere&& old_obj);
 
     ~Sphere();
+
+    void shift(float delta_t);
     
     Sphere& operator = (Sphere&& rv);
 
@@ -80,10 +94,24 @@ public:
     void change_position(float delta_x, float delta_y, float delta_z);
 
     //float illumination(const Matrix& ray_light, int light_number);
+    
+    friend int operator == (const Sphere& fir_sph, const Sphere& sec_sph);
 
     void get_info(FILE* output_file);
 
+    friend float get_time_before_bump(Sphere& fir_sphere, Sphere& sec_sphere);
+
+    friend float get_time_before_bump(Flatness& flat, Sphere& sphere);
+
+    friend void calculate_bump(Sphere& fir_sphere, Sphere& sec_sphere);
+
+    friend void calculate_bump(Flatness& flat, Sphere& sphere);
+
+    friend void shift_sphere(Sphere& cur_sph);
+
     friend class Elastic_interaction;
+
+    friend class Physics_engine;
 };
 //-----------------------------------------------------------
 
@@ -101,8 +129,6 @@ private:
 
     Matrix velocity;
 
-    //float* phys_param;    //набор физических параметров
-
 public:
 
     Flatness(FILE* input_file);
@@ -113,6 +139,8 @@ public:
 
     ~Flatness();
 
+    void shift(float delta_t);
+
     Flatness& operator = (Flatness&& rv);
 
     Flatness& operator = (const Flatness&) = delete;
@@ -122,6 +150,16 @@ public:
     void get_info(FILE* output_file);
 
     //float illumination(const Matrix& ray_light, int light_number); //данные об источники света берутся из сатитик переменной отрисовки 
+
+    friend float get_time_before_bump(Flatness& flat, Sphere& sphere);
+
+    friend void calculate_bump(Flatness& flat, Sphere& sphere);
+
+    friend void shift_flat(Flatness& cur_flat);
+
+    friend float distance(Flatness& flat, Point& point);
+
+    friend float get_koef_D(Point& point, Flatness& flat);
 };
 //-----------------------------------------------------------
 

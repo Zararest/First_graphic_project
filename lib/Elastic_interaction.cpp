@@ -129,6 +129,19 @@ Elastic_interaction& Elastic_interaction::operator = (Elastic_interaction&& rv){
     return *this;
 }
 
+Matrix Elastic_interaction::cur_force_fir_sphere(){
+
+    float distance_between_centres = create_vector(fir_obj->centre, sec_obj->centre).modul();
+    float force_value = (distance_between_centres - normal_distance) * koef_k;
+    
+    return force_value * (1 / distance_between_centres) * create_vector(fir_obj->centre, sec_obj->centre);
+}
+
+Matrix Elastic_interaction::cur_force_sec_sphere(){
+
+    return (-1) * this->cur_force_fir_sphere();
+}
+
 void Elastic_interaction::get_info(FILE* output_file){
 
     fprintf(output_file, "Elastic interaction info:\n\n");

@@ -40,6 +40,8 @@ public:
 
     int length();//+
 
+    float modul();
+
     float determinant();//+
 
     int is_quadratic();//+

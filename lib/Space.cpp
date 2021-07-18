@@ -122,3 +122,39 @@ void Space::get_info(FILE* output_file){
     }
     printf("\n\n");
 }
+
+
+Matrix create_vector(const Point& fir_point, const Point& sec_point){
+
+    Matrix tmp_vector(3, 1, (float)0);
+
+    tmp_vector[0][0] = (float)(sec_point.x - fir_point.x);
+    tmp_vector[1][0] = (float)(sec_point.y - fir_point.y);
+    tmp_vector[2][0] = (float)(sec_point.z - fir_point.z);
+
+    return static_cast<Matrix&&>(tmp_vector);
+}
+
+float get_koef_D(Point& point, Flatness& flat){
+
+    return point.x * flat.normal[0][0] + point.y * flat.normal[1][0] + point.z * flat.normal[2][0];
+}
+
+float projection(Matrix& vector, Matrix&  axis){
+
+    return vector.modul() * cos(vector, axis);
+}
+
+float distance(Flatness& flat, Point& point){ //надо проверить
+ 
+    float koef_D = (-1) * get_koef_D(flat.base_point, flat);
+
+    if (flat.normal.modul() == 0){
+
+        printf("Warning: flatness has zero normal\n");
+        return 0;
+    } else{
+
+        return abs(get_koef_D(point, flat) + koef_D) / flat.normal.modul();
+    }
+}

@@ -28,7 +28,6 @@ Sphere::Sphere(FILE* input_file):
             go_to_end_of_line(input_file);
         }
 
-
         if (fscanf(input_file, "%f", &tmp) > 0){
 
             mass = tmp;
@@ -42,7 +41,15 @@ Sphere::Sphere(FILE* input_file):
 
         if (fscanf(input_file, "%f", &tmp) > 0){
 
-            dissipation = tmp;
+            if ((dissipation <= 1) && (dissipation >= 0)){
+
+                dissipation = tmp;
+            } else{
+
+                printf("Strange dissipation value[%f](dissipation value is '1' now)\n", tmp);
+                dissipation = 1;
+            }
+            
         } else{
 
             printf("Incorrect dissipation data in file[%ld]\n", ftell(input_file));
@@ -93,6 +100,16 @@ Sphere::~Sphere(){
     printf("Деструктор sphere\n");
 }
 
+void Sphere::shift(float delta_t){
+
+    if (mass >= 0){
+
+        centre.x += velocity[0][0] * delta_t;
+        centre.y += velocity[1][0] * delta_t;
+        centre.z += velocity[2][0] * delta_t;
+    }
+}
+
 Sphere& Sphere::operator = (Sphere&& rv){
 
     free(color);
@@ -113,6 +130,16 @@ Sphere& Sphere::operator = (Sphere&& rv){
     rv.phys_param = NULL;
 
     return *this;
+}
+
+int operator == (const Sphere& fir_sph, const Sphere& sec_sph){
+
+    if (fir_sph.centre != sec_sph.centre){
+
+        return 0;
+    }
+
+    return 1;
 }
 
 void Sphere::get_info(FILE* output_file){

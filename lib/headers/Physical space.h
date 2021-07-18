@@ -3,7 +3,6 @@
 
 #include "Objects.h"
 
-
 //-----------------------------------------------------------
 class Field{
 
@@ -38,9 +37,15 @@ public:
 
     Elastic_interaction& operator = (const Elastic_interaction&) = delete;
 
+    Matrix cur_force_fir_sphere();
+
+    Matrix cur_force_sec_sphere();
+
     void get_info(FILE* output_file);
 
     friend int scan_elastic_inter(FILE* input_file, Elastic_interaction*& arr_elastic_inter, Sphere* array_of_spheres, int num_sphers);
+
+    friend class Physics_engine;
 };
 //-----------------------------------------------------------
 
@@ -69,12 +74,12 @@ public:
     Space(const Space&) = delete;
 
     Space(Space&&) = delete;
+    
+    ~Space();
 
     Space& operator = (Space&&) = delete;
 
     Space& operator = (const Space&) = delete;
-
-    ~Space();
 
     void get_info(FILE* output_file);
 
@@ -91,16 +96,20 @@ class Physics_engine{                 //тут было наследование
 private:
 
     Space& cur_space;
-
-    float delta_t;
+    
+    int* spheres_that_bumped;
 
 public:
 
-    Physics_engine(Space& space, float delta_time);
+    Physics_engine(Space& space);
 
     ~Physics_engine();
+
+    void call_phys_engine(float delta_t);
+
+    void call_collision_engine(float delta_t);
     
-    void calc_offset();                  //сдвигает все что надо
+    void shift_objects(float delta_t);                  //сдвигает все что надо
 
     Matrix get_force(Sphere& cur_sphere);//просчитывает 
 
@@ -124,28 +133,6 @@ public:
     //функция отрисовки кадра 
     //смена позиции наблюдателя
     //?? пока плохо разобрался с отрисовкой
-};
-//-----------------------------------------------------------
-
-
-//-----------------------------------------------------------
-class Collision_engine{
-
-private:
-
-    Space& cur_space;
-
-public:
-
-    void calc_collisions();
-
-    int probability_of_collis(Sphere& fir_sphere, Sphere& sec_sphere); //условие удара помимо расстояния еще и направлнеие вектора скорости
-                                                                         //(так можно избежать множественных ударов)
-    int probability_of_collis(Sphere& cur_sphere, Flatness& cur_flat);
-
-    void sphere_sphere_collis(Sphere& fir_sphere, Sphere& sec_sphere);
-
-    void flat_sphere_collis(Flatness& cur_flat, Sphere& cur_sphere);
 };
 //-----------------------------------------------------------
 

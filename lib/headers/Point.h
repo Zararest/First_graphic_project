@@ -7,16 +7,16 @@
 #include <string.h>
 #include <math.h>
 
+class Flatness;
+class Matrix;
 
 class Point{
 
-private:
+public:
 
     float x;
     float y;
     float z;
-
-public:
 
     Point(){
 
@@ -76,6 +76,10 @@ public:
     friend float distance(Point& fir_point, Point& sec_point);
 
     friend Point get_point(FILE* input_file);
+
+    friend Matrix create_vector(const Point& fir_point, const Point& sec_point);
+
+    friend float get_koef_D(Point& point, Flatness& flat);
     
     friend class Sphere;
 

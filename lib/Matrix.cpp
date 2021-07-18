@@ -234,6 +234,26 @@ int Matrix::length(){
     }
 }
 
+float Matrix::modul(){
+
+    if (columns_count == 1){
+
+        float tmp = 0;
+
+        for (int i = 0; i < rows_count; i++){
+
+            tmp += data[i] * data[i];
+        }
+
+        assert(tmp >= 0);
+
+        return sqrt(tmp);
+    } else{
+
+        return -1;
+    }
+}
+
 int not_del_elem(int size, int* array){
 
     int i_has_found = 0;

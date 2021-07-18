@@ -7,7 +7,7 @@ void func(){//примерная работа с движками
 
     FILE* input = fopen("space.txt", "r");
     float delta_t = 2;
-
+    
     Space cur_space(input);
     Physics_engine phys_eng(cur_space, delta_t);
     //Rendering_engine rend_eng(cur_space);
