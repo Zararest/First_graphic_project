@@ -10,6 +10,7 @@ int scan_sphere_data(FILE* input_file, Sphere*& array_of_spheres){
         fseek(input_file, -1, SEEK_CUR);
 
         array_of_spheres = (Sphere*)realloc(array_of_spheres, counter * sizeof(Sphere));
+        array_of_spheres[counter - 1].init();
         array_of_spheres[counter - 1] = Sphere(input_file);
     }
     fgetc_without_space(input_file);
@@ -27,6 +28,7 @@ int scan_flat_data(FILE* input_file, Flatness*& array_of_flats){
         fseek(input_file, -1, SEEK_CUR);
 
         array_of_flats = (Flatness*)realloc(array_of_flats, counter * sizeof(Flatness));
+        array_of_flats[counter - 1].init();
         array_of_flats[counter - 1] = Flatness(input_file);
     }
     fgetc_without_space(input_file);
@@ -79,8 +81,6 @@ Space::Space(FILE* input_file){
 }
 
 Space::~Space(){
-
-    //printf("Деструктор space\n");
 
     for (int i = 0; i < number_of_spheres; i++){
 

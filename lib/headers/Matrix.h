@@ -35,6 +35,8 @@ public:
 
     ~Matrix();//+
 
+    void init();
+
     void transpose();//+
     
     void print(FILE* output_stream);//+

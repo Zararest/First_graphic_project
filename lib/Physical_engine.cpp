@@ -106,7 +106,7 @@ float get_time_before_bump(Flatness& flat, Sphere& sphere){
         oncoming_speed *= -1;
     }  
 
-    if ((oncoming_speed <= 0) || (check_intersection_with_bound_points(flat, sphere.velocity, sphere.centre) == 0)){
+    if ((oncoming_speed <= 0)){// || (check_intersection_with_bound_points(flat, sphere.velocity, sphere.centre) == 0)){
 
         return 0;
     } 
@@ -192,8 +192,8 @@ void calculate_bump(Flatness& flat, Sphere& sphere){
 
     sphere.velocity = flat.velocity + related_speed;
 
-    flat.get_info(stdout);
-    sphere.get_info(stdout);
+    //flat.get_info(stdout);
+    //sphere.get_info(stdout);
 }
 
 void Physics_engine::call_collision_engine(float delta_t){
@@ -311,7 +311,6 @@ Matrix Physics_engine::get_force(Sphere& cur_sphere){
 void Physics_engine::call_phys_engine(float delta_t){
 
     float tmp = 0;
-
     for (int i = 0; i < cur_space.number_of_spheres; i++){
 
         if (cur_space.array_of_spheres[i].mass != 0){
@@ -320,7 +319,7 @@ void Physics_engine::call_phys_engine(float delta_t){
             cur_space.array_of_spheres[i].velocity = cur_space.array_of_spheres[i].velocity + tmp * get_force(cur_space.array_of_spheres[i]);
         }
     }
-
+    
     call_collision_engine(delta_t);
 
     for (int i = 0; i < cur_space.number_of_spheres; i++){
@@ -341,10 +340,5 @@ void Physics_engine::call_phys_engine(float delta_t){
 
         cur_space.array_of_flats[i].shift(delta_t);
     }
-
-    printf("centers: ");
-    cur_space.array_of_spheres[0].centre.print(stdout);
-    cur_space.array_of_spheres[1].centre.print(stdout);
-    printf("\n\n");
 }
 

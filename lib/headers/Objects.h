@@ -51,6 +51,10 @@ public:
 
     ~Object();
 
+    Object(const Object&) = delete;
+
+    Object(Object&&) = delete;
+
     //virtual float illumination(Matrix vector, int light_number); //возвращает угол между вектором взгляда и вектором отражения для определенного исочника света
 
     friend void get_object_params(FILE* input_file, Object& tmp_obj);
@@ -98,6 +102,10 @@ public:
     friend int operator == (const Sphere& fir_sph, const Sphere& sec_sph);
 
     void get_info(FILE* output_file);
+
+    void init();
+
+    friend int check_intersection_with_sphere(Sphere& sphere, Matrix& vector, Point& base_point_of_vector);
 
     friend float get_time_before_bump(Sphere& fir_sphere, Sphere& sec_sphere);
 
@@ -148,6 +156,8 @@ public:
     void change_position(float delta_x, float delta_y, float delta_z); //можно добавить вращение у плскости
 
     void get_info(FILE* output_file);
+
+    void init();
 
     //float illumination(const Matrix& ray_light, int light_number); //данные об источники света берутся из сатитик переменной отрисовки 
 

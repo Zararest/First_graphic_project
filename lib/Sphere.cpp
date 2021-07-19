@@ -4,9 +4,8 @@ Sphere::Sphere(FILE* input_file):
 
     Object(),
     centre(),    
-    velocity(3, 1, (float*)NULL)
+    velocity(3, 1, (float)0)
 {
-
     radius = 1;
     mass = 0;
     phys_param = NULL;
@@ -62,7 +61,6 @@ Sphere::Sphere(FILE* input_file):
 
             printf("Too many parameters in file[%ld]\n", ftell(input_file));
             go_to_end_of_line(input_file);
-            fgetc(input_file);
         }
         fgetc_without_space(input_file);
     }
@@ -73,6 +71,7 @@ Sphere::Sphere(Sphere&& old_obj):
     velocity(old_obj.velocity),//какой тут конструктор вызывается
     centre(old_obj.centre)
 {   
+    printf("конструктор перемещения сферы\n");
     free(phys_param);
     free(color);
     radius = old_obj.radius;
@@ -97,11 +96,11 @@ Sphere::~Sphere(){
     radius = 0;
     mass = 0;
     dissipation = 0;
-    //printf("Деструктор sphere\n");
 }
 
 void Sphere::shift(float delta_t){
 
+    //printf()
     if (mass >= 0){
 
         centre.x += velocity[0][0] * delta_t;
@@ -140,6 +139,54 @@ int operator == (const Sphere& fir_sph, const Sphere& sec_sph){
     }
 
     return 1;
+}
+
+int check_intersection_with_sphere(Sphere& sphere, Matrix& vector, Point& base_point_of_vector){//расчет в тетради 
+
+    float tmp_koef_b = base_point_of_vector.x * vector[0][0] + base_point_of_vector.y * vector[1][0] + base_point_of_vector.z * vector[2][0];
+    float tmp_koef_a = vector.modul() * vector.modul();
+    float tmp_koef_c = pow(base_point_of_vector.x, 2) + pow(base_point_of_vector.y, 2) + pow(base_point_of_vector.z, 2);
+    float determinant = 4 * tmp_koef_b * tmp_koef_b - 4 * tmp_koef_a * tmp_koef_c;
+
+    if (determinant >= 0){
+
+        return 1;
+    } else{
+
+        return 0;
+    }
+    /*float t_fir = 0, t_sec = 0;
+    Point fir_intersec_point, sec_intersec_point;
+
+    t_fir = (sqrt(determinant) - 2 * tmp_koef_b) / (2 * tmp_koef_c);
+    t_sec = ((-1) * sqrt(determinant) - 2 * tmp_koef_b) / (2 * tmp_koef_c);
+
+    fir_intersec_point.x = base_point_of_vector.x + vector[0][0] * t_fir;
+    fir_intersec_point.y = base_point_of_vector.y + vector[1][0] * t_fir;
+    fir_intersec_point.z = base_point_of_vector.z + vector[2][0] * t_fir;
+
+    sec_intersec_point.x = base_point_of_vector.x + vector[0][0] * t_sec;
+    sec_intersec_point.y = base_point_of_vector.y + vector[1][0] * t_sec;
+    sec_intersec_point.z = base_point_of_vector.z + vector[2][0] * t_sec;
+
+    if (distance(base_point_of_vector, fir_intersec_point) > distance(base_point_of_vector, sec_intersec_point)){
+
+    }*/
+}
+
+void Sphere::init(){
+
+    this->color = NULL;
+    this->centre.x = 0;
+    this->centre.y = 0;
+    this->centre.z = 0;
+    this->dissipation = 0;
+    this->number_of_param = 0;
+    this->phys_param = NULL;
+    this->radius = 0;
+    this->surface = 0;
+    this->transpendecy = 0;
+    this->velocity.init();
 }
 
 void Sphere::get_info(FILE* output_file){

@@ -208,3 +208,13 @@ void Flatness::get_info(FILE* output_file){
     fprintf(output_file, "\n");
 }
 
+void Flatness::init(){
+
+    normal.init();
+    base_point.x = 0;
+    base_point.y = 0;
+    base_point.z = 0;
+    bounding_points = NULL;
+    velocity.init();
+}
+

@@ -157,14 +157,19 @@ Matrix::Matrix(Matrix&& old_obj){
 
 Matrix::~Matrix(){
 
-    //printf("Деструктор\n\n");
-
     if (data != NULL){
 
         data[0] = -228; //проверка что старые данные не используются
     }
     
     free(data);
+}
+
+void Matrix::init(){
+
+    data = NULL;
+    rows_count = 0;
+    columns_count = 0;
 }
 
 void Matrix::transpose(){

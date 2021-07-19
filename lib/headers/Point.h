@@ -41,9 +41,6 @@ public:
 
     ~Point(){
         
-        x = 0;
-        y = 0;
-        z = 0;
     }
 
     Point& operator = (const Point& old_point){
