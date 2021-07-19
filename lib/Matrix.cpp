@@ -488,7 +488,7 @@ Matrix operator * (const Matrix& L_matr, const Matrix& R_matr){
     return static_cast<Matrix&&>(tmp_obj); 
 }
 
-Matrix operator * (int number, const Matrix& matr){
+Matrix operator * (float number, const Matrix& matr){
 
     //rintf("Оператор число * матрица\n\n");
 

@@ -1,4 +1,4 @@
-#include "headers/Physical space.h"
+#include "headers/Physical_space.h"
 
 int scan_sphere_data(FILE* input_file, Sphere*& array_of_spheres){
 
@@ -80,7 +80,7 @@ Space::Space(FILE* input_file){
 
 Space::~Space(){
 
-    printf("Деструктор space\n");
+    //printf("Деструктор space\n");
 
     for (int i = 0; i < number_of_spheres; i++){
 
@@ -123,7 +123,6 @@ void Space::get_info(FILE* output_file){
     printf("\n\n");
 }
 
-
 Matrix create_vector(const Point& fir_point, const Point& sec_point){
 
     Matrix tmp_vector(3, 1, (float)0);
@@ -158,3 +157,11 @@ float distance(Flatness& flat, Point& point){ //надо проверить
         return abs(get_koef_D(point, flat) + koef_D) / flat.normal.modul();
     }
 }
+
+float distance(Point& fir_pnt, Point& sec_pnt){
+
+    float distance = pow(fir_pnt.x - sec_pnt.x, 2) + pow(fir_pnt.y - sec_pnt.y, 2) + pow(fir_pnt.z - sec_pnt.z, 2);
+     
+    return sqrt(distance);
+}
+

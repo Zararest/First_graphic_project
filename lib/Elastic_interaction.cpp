@@ -1,4 +1,4 @@
-#include "headers/Physical space.h"
+#include "headers/Physical_space.h"
 
 Elastic_interaction::Elastic_interaction(FILE* input_file, Sphere* array_of_spheres, int number_of_spheres){
 
@@ -115,7 +115,7 @@ Elastic_interaction::~Elastic_interaction(){
 
     fir_obj = NULL;
     sec_obj = NULL;
-    printf("Деструктор elastic\n");
+    //printf("Деструктор elastic\n");
 }
 
 Elastic_interaction& Elastic_interaction::operator = (Elastic_interaction&& rv){

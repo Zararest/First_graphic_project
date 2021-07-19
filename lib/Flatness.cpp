@@ -101,14 +101,33 @@ Flatness::Flatness(Flatness&& old_obj):
 
 Flatness::~Flatness(){
 
-    printf("Деструктор flatness\n");
+    //printf("Деструктор flatness\n");
 }
 
 void Flatness::shift(float delta_t){
 
+    int i = 1;
+
     base_point.x += velocity[0][0] * delta_t;
     base_point.y += velocity[1][0] * delta_t;
     base_point.z += velocity[2][0] * delta_t;
+
+    if (bounding_points != NULL){
+
+        while (bounding_points[i] != bounding_points[0]){
+            
+            bounding_points[i].x += velocity[0][0] * delta_t;
+            bounding_points[i].y += velocity[1][0] * delta_t;
+            bounding_points[i].z += velocity[2][0] * delta_t;
+            i++;
+        }
+
+        bounding_points[0].x += velocity[0][0] * delta_t;
+        bounding_points[0].y += velocity[1][0] * delta_t;
+        bounding_points[0].z += velocity[2][0] * delta_t;
+
+        bounding_points[i] = bounding_points[0];
+    }
 }
 
 Flatness& Flatness::operator = (Flatness&& rv){

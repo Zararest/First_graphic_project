@@ -53,7 +53,7 @@ Object::Object(){
 
 Object::~Object(){
 
-    printf("Деструктор object\n");
+    //printf("Деструктор object\n");
     transpendecy = 0; 
     surface = 0;        
     number_of_param = 0; 

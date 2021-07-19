@@ -8,7 +8,7 @@ class Field{
 
 public:
 
-    Matrix return_force(Sphere& cur_obj); //возвращает силу
+    virtual Matrix return_force(Sphere& cur_obj); //возвращает силу
 };
 //-----------------------------------------------------------
 

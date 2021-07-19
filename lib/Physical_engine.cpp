@@ -1,4 +1,4 @@
-#include "headers/Physical space.h"
+#include "headers/Physical_space.h"
 
 Physics_engine::Physics_engine(Space& space):
 
@@ -10,6 +10,62 @@ Physics_engine::Physics_engine(Space& space):
 Physics_engine::~Physics_engine(){
 
     free(spheres_that_bumped);
+}
+
+int check_intersection_with_bound_points(Flatness& flat, Matrix& vector, Point& base_point_of_vector){
+
+    Point intersection_point;
+    Matrix tmp_vector(3, 1, (float)0);
+    float angle_sum = 0;//сумма углов между векторами с началом в точке пересечения и ограничивающими точками
+    float koef_D = (-1) * get_koef_D(flat.base_point, flat);
+    float t = 0, tmp_koef_top = 0, tmp_koef_bot = 0;//параметр в уравнении прямой и числитель с знаменателем
+    int i = 1;
+
+    tmp_koef_top = koef_D + flat.normal[0][0] * base_point_of_vector.x + flat.normal[1][0] * base_point_of_vector.y + flat.normal[2][0] * base_point_of_vector.z;
+    tmp_koef_bot = flat.normal[0][0] * vector[0][0] + flat.normal[1][0] * vector[1][0] + flat.normal[2][0] * vector[2][0];
+
+    if (tmp_koef_bot == 0){
+
+        return 0;
+    }
+
+    t = (-1) * tmp_koef_top / tmp_koef_bot;
+    intersection_point.x = base_point_of_vector.x + vector[0][0] * t;
+    intersection_point.y = base_point_of_vector.y + vector[1][0] * t;
+    intersection_point.z = base_point_of_vector.z + vector[2][0] * t;
+
+    if (flat.bounding_points != NULL){
+
+        while (flat.bounding_points[0] != flat.bounding_points[i]){
+
+            i++;
+        }
+
+        if (i < 3){
+
+            return 0;
+        }
+
+        tmp_vector = create_vector(intersection_point, flat.bounding_points[0]);
+
+        for (int j = 1; j < i; j++){
+
+            
+            angle_sum += acos(cos(tmp_vector, create_vector(intersection_point, flat.bounding_points[j])));
+            tmp_vector = create_vector(intersection_point, flat.bounding_points[j]);
+        }
+
+        if (angle_sum >= 3.141592){
+
+            return 1;
+        } else{
+
+            return 0;
+        }
+    } else{
+
+        return 0;
+    }
 }
 
 float get_time_before_bump(Sphere& fir_sphere, Sphere& sec_sphere){
@@ -38,6 +94,11 @@ float get_time_before_bump(Flatness& flat, Sphere& sphere){
 
     float oncoming_speed = 0, koef_D = (-1) * get_koef_D(flat.base_point, flat);
 
+    if (sphere.mass == 0){
+
+        return 0;
+    }
+
     oncoming_speed = projection(sphere.velocity, flat.normal) - projection(flat.velocity, flat.normal);
 
     if ((get_koef_D(sphere.centre, flat) + koef_D) < 0){
@@ -45,19 +106,18 @@ float get_time_before_bump(Flatness& flat, Sphere& sphere){
         oncoming_speed *= -1;
     }  
 
-    if (oncoming_speed > 0){
-
-        return (distance(flat, sphere.centre) - sphere.radius) / oncoming_speed;
-    } else{
+    if ((oncoming_speed <= 0) || (check_intersection_with_bound_points(flat, sphere.velocity, sphere.centre) == 0)){
 
         return 0;
-    }
+    } 
+
+    return (distance(flat, sphere.centre) - sphere.radius) / oncoming_speed;
 }
 
 void calculate_bump(Sphere& fir_sphere, Sphere& sec_sphere){//шары абсолютно гладкие и при ударе никуда не двигаются 
 
     float oncoming_speed = 0, discriminant = 0;
-    Matrix tmp_axis(3, 1, (float)0);
+    Matrix tmp_axis(3, 1, (float)0), tmp(3, 1, (float)0);
     
     tmp_axis = create_vector(fir_sphere.centre, sec_sphere.centre);
 
@@ -81,11 +141,14 @@ void calculate_bump(Sphere& fir_sphere, Sphere& sec_sphere){//шары абсо�
             U_L = tmp_const_a / m_L - U_R * m_R / m_L;
             oncoming_speed = U_L - U_R;
 
+            printf("first speed = %f secnd speed = %f\n\n", U_L, U_R);
             if (oncoming_speed > 0){
 
                 U_R = ((-1) * sqrt(discriminant) + 2 * tmp_const_a * m_R / m_L) / (2 * (m_R * m_R / m_L + m_R));
                 U_L = tmp_const_a / m_L - U_R * m_R / m_L;
                 oncoming_speed = U_L - U_R;
+
+                printf("another first speed = %f secnd speed = %f\n\n", U_L, U_R);
             }
 
             if (oncoming_speed < 0){
@@ -125,17 +188,12 @@ void calculate_bump(Flatness& flat, Sphere& sphere){
 
     assert(flat.normal.modul() > 0);
 
-    if ((get_koef_D(sphere.centre, flat) + koef_D) > 0){
-
-        related_speed = sphere.dissipation * (related_speed + 2 * (projection_normal) / flat.normal.modul() * flat.normal);
-    }  
-
-    if ((get_koef_D(sphere.centre, flat) + koef_D) < 0){
-
-        related_speed = sphere.dissipation * (related_speed - 2 * (projection_normal) / flat.normal.modul() * flat.normal);
-    }  
+    related_speed = sphere.dissipation * (related_speed - 2 * (projection_normal) / flat.normal.modul() * flat.normal);
 
     sphere.velocity = flat.velocity + related_speed;
+
+    flat.get_info(stdout);
+    sphere.get_info(stdout);
 }
 
 void Physics_engine::call_collision_engine(float delta_t){
@@ -237,10 +295,9 @@ Matrix Physics_engine::get_force(Sphere& cur_sphere){
         }
     }
 
-    if (cur_sphere.number_of_param >= cur_space.number_of_fields){
+    if (cur_sphere.number_of_param > cur_space.number_of_fields){
 
-        printf("Too many parameters\n");
-        cur_sphere.get_info(stdout);
+        printf("Too many phys parameters\n");
     }
 
     for (int i = 0; i < min(cur_sphere.number_of_param, cur_space.number_of_fields); i++){
@@ -264,13 +321,16 @@ void Physics_engine::call_phys_engine(float delta_t){
         }
     }
 
-    //call_collision_engine(delta_t);
+    call_collision_engine(delta_t);
 
     for (int i = 0; i < cur_space.number_of_spheres; i++){
 
         if (spheres_that_bumped[i] == 0){
 
-            cur_space.array_of_spheres[i].shift(delta_t);
+            if (cur_space.array_of_spheres[i].mass != -1){
+
+                cur_space.array_of_spheres[i].shift(delta_t);
+            }
         } else{
 
             spheres_that_bumped[i] = 0;
@@ -281,5 +341,10 @@ void Physics_engine::call_phys_engine(float delta_t){
 
         cur_space.array_of_flats[i].shift(delta_t);
     }
+
+    printf("centers: ");
+    cur_space.array_of_spheres[0].centre.print(stdout);
+    cur_space.array_of_spheres[1].centre.print(stdout);
+    printf("\n\n");
 }
 

@@ -6,6 +6,7 @@
 #include <cassert>
 #include <string.h>
 #include <math.h>
+#include <cmath>
 
 char my_getc(FILE* input);
 
@@ -60,7 +61,7 @@ public:
 
     friend Matrix operator * (const Matrix& matr, int number);//+
 
-    friend Matrix operator * (int number, const Matrix& matr);//+
+    friend Matrix operator * (float number, const Matrix& matr);//+
  
     friend Matrix operator + (const Matrix& L_matr, const Matrix& R_matr);//+         //если не совпадают размеры, то ассерт
 

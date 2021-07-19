@@ -20,13 +20,13 @@ Matrix get_vector(FILE* input_file);
 
 Point get_point(FILE* input_file);
 
-float distance(Flatness& flat, Point& point);
-
 Matrix create_vector(const Point& fir_point, const Point& sec_point);
 
 float get_koef_D(Point& point, Flatness& flat);
 
 float projection(Matrix& vector, Matrix&  axis);
+
+float distance(Point& fir_point, Point& sec_point);
 
 float distance(Flatness& flat, Point& point);
 
@@ -152,6 +152,8 @@ public:
     //float illumination(const Matrix& ray_light, int light_number); //данные об источники света берутся из сатитик переменной отрисовки 
 
     friend float get_time_before_bump(Flatness& flat, Sphere& sphere);
+
+    friend int check_intersection_with_bound_points(Flatness& flat, Matrix& vector, Point& base_point_of_vector);
 
     friend void calculate_bump(Flatness& flat, Sphere& sphere);
 

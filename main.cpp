@@ -1,5 +1,5 @@
 #include "lib/headers/Matrix.h"
-#include "lib/headers/Physical space.h"
+#include "lib/headers/Physical_space.h"
 //g++ main.o -o main -lsfml-graphics -lsfml-window -lsfml-system
 
 

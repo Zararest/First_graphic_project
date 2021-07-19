@@ -46,7 +46,7 @@ Sphere::Sphere(FILE* input_file):
                 dissipation = tmp;
             } else{
 
-                printf("Strange dissipation value[%f](dissipation value is '1' now)\n", tmp);
+                printf("Strange dissipation value in file[%ld](dissipation value is '1' now)\n", ftell(input_file));
                 dissipation = 1;
             }
             
@@ -97,7 +97,7 @@ Sphere::~Sphere(){
     radius = 0;
     mass = 0;
     dissipation = 0;
-    printf("Деструктор sphere\n");
+    //printf("Деструктор sphere\n");
 }
 
 void Sphere::shift(float delta_t){
