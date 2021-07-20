@@ -4,19 +4,19 @@ main: main.o Matrix.o
 main.o: main.cpp 
 	g++ -c main.cpp
 
-Matrix.o: lib/Matrix.cpp
-	g++ -c lib/Matrix.cpp
+Matrix.o: src/Matrix.cpp
+	g++ -c src/Matrix.cpp
 
-Object.o: lib/Object.cpp lib/Matrix.cpp lib/Point.cpp
-	g++ -c lib/Object.cpp lib/Matrix.cpp lib/Point.cpp
+Object.o: src/Object.cpp src/Matrix.cpp src/Point.cpp
+	g++ -c src/Object.cpp src/Matrix.cpp src/Point.cpp
 
 
-test: lib/Object.cpp lib/Matrix.cpp lib/Point.cpp test.cpp lib/Sphere.cpp lib/Flatness.cpp lib/Space.cpp lib/Elastic_interaction.cpp lib/Physical_engine.cpp
-	g++ lib/Object.cpp lib/Matrix.cpp lib/Point.cpp test.cpp lib/Sphere.cpp lib/Flatness.cpp lib/Space.cpp lib/Elastic_interaction.cpp lib/Physical_engine.cpp -o test
+test: src/Object.cpp src/Matrix.cpp src/Point.cpp test.cpp src/Sphere.cpp src/Flatness.cpp src/Space.cpp src/Elastic_interaction.cpp src/Physical_engine.cpp
+	g++ src/Object.cpp src/Matrix.cpp src/Point.cpp test.cpp src/Sphere.cpp src/Flatness.cpp src/Space.cpp src/Elastic_interaction.cpp src/Physical_engine.cpp -o build/test
 
 
 
 .PHONY : clean
 clean:
 	rm -rf *.o main
-	rm -rf *.o test
+	rm -rf *.o build/test
