@@ -259,6 +259,14 @@ float Matrix::modul(){
     }
 }
 
+void Matrix::normalize(){
+
+    if (this->modul() != 0){
+
+        *this = (1 / this->modul()) * (*this);
+    }
+}
+
 int not_del_elem(int size, int* array){
 
     int i_has_found = 0;

@@ -43,7 +43,9 @@ public:
 
     int length();//+
 
-    float modul();
+    float modul();//+
+
+    void normalize();
 
     float determinant();//+
 

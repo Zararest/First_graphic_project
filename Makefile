@@ -11,8 +11,8 @@ Object.o: src/Object.cpp src/Matrix.cpp src/Point.cpp
 	g++ -c src/Object.cpp src/Matrix.cpp src/Point.cpp
 
 
-test: src/Object.cpp src/Matrix.cpp src/Point.cpp test.cpp src/Sphere.cpp src/Flatness.cpp src/Space.cpp src/Elastic_interaction.cpp src/Physical_engine.cpp
-	g++ src/Object.cpp src/Matrix.cpp src/Point.cpp test.cpp src/Sphere.cpp src/Flatness.cpp src/Space.cpp src/Elastic_interaction.cpp src/Physical_engine.cpp -o build/test
+test: src/Object.cpp src/Matrix.cpp src/Point.cpp test.cpp src/Sphere.cpp src/Flatness.cpp src/Space.cpp src/Elastic_interaction.cpp src/Physical_engine.cpp src/Light_source.cpp src/Rendering_engine.cpp
+	g++ src/Object.cpp src/Matrix.cpp src/Point.cpp test.cpp src/Sphere.cpp src/Flatness.cpp src/Space.cpp src/Elastic_interaction.cpp src/Physical_engine.cpp src/Light_source.cpp src/Rendering_engine.cpp -o build/test -lsfml-graphics -lsfml-window -lsfml-system
 
 
 

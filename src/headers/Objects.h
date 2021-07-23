@@ -30,6 +30,61 @@ float distance(Point& fir_point, Point& sec_point);
 
 float distance(Flatness& flat, Point& point);
 
+float distance(Point& fir_point, Point& sec_point);
+
+int check_intersection_with_bound_points(Flatness& flat, Matrix& vector, Point& base_point_of_vector);
+
+int check_intersection_with_sphere(Sphere& sphere, Matrix& vector, Point& base_point_of_vector);
+
+//Point get_intersection_point(Sphere& space, Matrix& vector, Point& base_point_of_vector);
+
+
+typedef struct color_struct {
+    
+    int R = 255;
+    int G = 255;
+    int B = 255;
+} colour;
+
+
+//-----------------------------------------------------------
+class Field{
+
+public:
+
+    virtual Matrix return_force(Sphere& cur_obj); //возвращает силу
+};
+//-----------------------------------------------------------
+
+//-----------------------------------------------------------
+class Light_source{
+
+private:
+
+    Point position;
+
+    float brightness;
+
+public:
+
+    Light_source(FILE* input_file);
+
+    Light_source(const Light_source&) = delete;
+
+    Light_source(Light_source&&) = delete;
+
+    ~Light_source();
+
+    Light_source& operator = (const Light_source&) = delete;
+
+    Light_source& operator = (Light_source&& rv);
+
+    void get_info(FILE* output_file);
+
+    friend class Sphere;
+};
+//-----------------------------------------------------------
+
 //-----------------------------------------------------------
 class Object{
 
@@ -55,7 +110,11 @@ public:
 
     Object(Object&&) = delete;
 
-    //virtual float illumination(Matrix vector, int light_number); //возвращает угол между вектором взгляда и вектором отражения для определенного исочника света
+    //virtual int check_intersection(Matrix& vector, Point& base_point_of_vector);
+
+    //virtual Point get_intersection_point(Matrix& vector, Point& base_point_of_vector);
+
+    //virtual colour illumination(Matrix& vector, Light_source& cur_light_source, Point& intersec_point); //возвращает угол между вектором взгляда и вектором отражения для определенного исочника света
 
     friend void get_object_params(FILE* input_file, Object& tmp_obj);
 };
@@ -97,15 +156,17 @@ public:
 
     void change_position(float delta_x, float delta_y, float delta_z);
 
-    //float illumination(const Matrix& ray_light, int light_number);
+    int check_intersection(Matrix& vector, Point& base_point_of_vector);
+
+    Point get_intersection_point(Matrix& vector, Point& base_point_of_vector);
+
+    colour illumination(Matrix& vector, Light_source& cur_light_source, Point& intersec_point); 
     
     friend int operator == (const Sphere& fir_sph, const Sphere& sec_sph);
 
     void get_info(FILE* output_file);
 
     void init();
-
-    friend int check_intersection_with_sphere(Sphere& sphere, Matrix& vector, Point& base_point_of_vector);
 
     friend float get_time_before_bump(Sphere& fir_sphere, Sphere& sec_sphere);
 
@@ -155,15 +216,17 @@ public:
 
     void change_position(float delta_x, float delta_y, float delta_z); //можно добавить вращение у плскости
 
+    int check_intersection(Matrix& vector, Point& base_point_of_vector);
+
+    Point get_intersection_point(Matrix& vector, Point& base_point_of_vector);
+
     void get_info(FILE* output_file);
 
     void init();
 
-    //float illumination(const Matrix& ray_light, int light_number); //данные об источники света берутся из сатитик переменной отрисовки 
+    colour illumination(Matrix& vector, Light_source& cur_light_source, Point& intersec_point);
 
     friend float get_time_before_bump(Flatness& flat, Sphere& sphere);
-
-    friend int check_intersection_with_bound_points(Flatness& flat, Matrix& vector, Point& base_point_of_vector);
 
     friend void calculate_bump(Flatness& flat, Sphere& sphere);
 

@@ -12,62 +12,6 @@ Physics_engine::~Physics_engine(){
     free(spheres_that_bumped);
 }
 
-int check_intersection_with_bound_points(Flatness& flat, Matrix& vector, Point& base_point_of_vector){
-
-    Point intersection_point;
-    Matrix tmp_vector(3, 1, (float)0);
-    float angle_sum = 0;//сумма углов между векторами с началом в точке пересечения и ограничивающими точками
-    float koef_D = (-1) * get_koef_D(flat.base_point, flat);
-    float t = 0, tmp_koef_top = 0, tmp_koef_bot = 0;//параметр в уравнении прямой и числитель с знаменателем
-    int i = 1;
-
-    tmp_koef_top = koef_D + flat.normal[0][0] * base_point_of_vector.x + flat.normal[1][0] * base_point_of_vector.y + flat.normal[2][0] * base_point_of_vector.z;
-    tmp_koef_bot = flat.normal[0][0] * vector[0][0] + flat.normal[1][0] * vector[1][0] + flat.normal[2][0] * vector[2][0];
-
-    if (tmp_koef_bot == 0){
-
-        return 0;
-    }
-
-    t = (-1) * tmp_koef_top / tmp_koef_bot;
-    intersection_point.x = base_point_of_vector.x + vector[0][0] * t;
-    intersection_point.y = base_point_of_vector.y + vector[1][0] * t;
-    intersection_point.z = base_point_of_vector.z + vector[2][0] * t;
-
-    if (flat.bounding_points != NULL){
-
-        while (flat.bounding_points[0] != flat.bounding_points[i]){
-
-            i++;
-        }
-
-        if (i < 3){
-
-            return 0;
-        }
-
-        tmp_vector = create_vector(intersection_point, flat.bounding_points[0]);
-
-        for (int j = 1; j < i; j++){
-
-            
-            angle_sum += acos(cos(tmp_vector, create_vector(intersection_point, flat.bounding_points[j])));
-            tmp_vector = create_vector(intersection_point, flat.bounding_points[j]);
-        }
-
-        if (angle_sum >= 3.141592){
-
-            return 1;
-        } else{
-
-            return 0;
-        }
-    } else{
-
-        return 0;
-    }
-}
-
 float get_time_before_bump(Sphere& fir_sphere, Sphere& sec_sphere){
 
     float oncoming_speed = 0;

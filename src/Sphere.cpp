@@ -141,11 +141,11 @@ int operator == (const Sphere& fir_sph, const Sphere& sec_sph){
     return 1;
 }
 
-int check_intersection_with_sphere(Sphere& sphere, Matrix& vector, Point& base_point_of_vector){//расчет в тетради 
+int Sphere::check_intersection(Matrix& vector, Point& base_point_of_vector){
 
     float tmp_koef_b = base_point_of_vector.x * vector[0][0] + base_point_of_vector.y * vector[1][0] + base_point_of_vector.z * vector[2][0];
     float tmp_koef_a = vector.modul() * vector.modul();
-    float tmp_koef_c = pow(base_point_of_vector.x, 2) + pow(base_point_of_vector.y, 2) + pow(base_point_of_vector.z, 2);
+    float tmp_koef_c = pow(base_point_of_vector.x, 2) + pow(base_point_of_vector.y, 2) + pow(base_point_of_vector.z, 2) - pow(radius, 2);
     float determinant = 4 * tmp_koef_b * tmp_koef_b - 4 * tmp_koef_a * tmp_koef_c;
 
     if (determinant >= 0){
@@ -155,11 +155,25 @@ int check_intersection_with_sphere(Sphere& sphere, Matrix& vector, Point& base_p
 
         return 0;
     }
-    /*float t_fir = 0, t_sec = 0;
+}
+
+Point Sphere::get_intersection_point(Matrix& vector, Point& base_point_of_vector){
+
+    float tmp_koef_b = base_point_of_vector.x * vector[0][0] + base_point_of_vector.y * vector[1][0] + base_point_of_vector.z * vector[2][0];
+    float tmp_koef_a = vector.modul() * vector.modul();
+    float tmp_koef_c = pow(base_point_of_vector.x, 2) + pow(base_point_of_vector.y, 2) + pow(base_point_of_vector.z, 2) - pow(radius, 2);
+    float determinant = 4 * tmp_koef_b * tmp_koef_b - 4 * tmp_koef_a * tmp_koef_c;
+
+    if (determinant >= 0){
+
+        return Point();
+    }
+
+    float t_fir = 0, t_sec = 0;
     Point fir_intersec_point, sec_intersec_point;
 
-    t_fir = (sqrt(determinant) - 2 * tmp_koef_b) / (2 * tmp_koef_c);
-    t_sec = ((-1) * sqrt(determinant) - 2 * tmp_koef_b) / (2 * tmp_koef_c);
+    t_fir = (sqrt(determinant) - 2 * tmp_koef_b) / (2 * tmp_koef_a);
+    t_sec = ((-1) * sqrt(determinant) - 2 * tmp_koef_b) / (2 * tmp_koef_a);
 
     fir_intersec_point.x = base_point_of_vector.x + vector[0][0] * t_fir;
     fir_intersec_point.y = base_point_of_vector.y + vector[1][0] * t_fir;
@@ -171,7 +185,64 @@ int check_intersection_with_sphere(Sphere& sphere, Matrix& vector, Point& base_p
 
     if (distance(base_point_of_vector, fir_intersec_point) > distance(base_point_of_vector, sec_intersec_point)){
 
-    }*/
+        return sec_intersec_point;
+    } else{
+
+        return fir_intersec_point;
+    }
+}
+
+float min(float fir, float sec, float trd){
+
+    if ((fir <= sec) && (fir <= trd)){
+
+        return fir;
+    }
+    
+    if ((sec <= fir) && (sec <= trd)){
+
+        return sec;
+    }
+
+    if ((trd <= fir) && (trd <= sec)){
+
+        return trd;
+    } else{
+
+        printf("dafuq\n");
+        return 0;
+    }
+}
+
+colour Sphere::illumination(Matrix& view_vector, Light_source& cur_light_source, Point& intersec_point){
+
+    Matrix normal(3, 1, (float)0);
+    Matrix ray_of_light(3, 1, (float)0);
+    Matrix reflected_ray(3, 1, (float)0);
+    colour cur_color;
+    float brightness_koef = 0;
+
+    if (min(color[0], color[1], color[2]) == 0){
+
+        brightness_koef = 255;
+    } else{
+
+        brightness_koef = 255 / min(color[0], color[1], color[2]);
+    }
+
+    normal = create_vector(centre, intersec_point);
+    normal.normalize();
+    assert(normal.modul() != 0);
+
+    ray_of_light = create_vector(cur_light_source.position, intersec_point);
+
+    reflected_ray = ray_of_light - 2 * projection(ray_of_light, normal) * normal;
+
+    cur_color.R = color[0] * pow(cos(view_vector, reflected_ray), surface) * cur_light_source.brightness;
+    cur_color.G = color[1] * pow(cos(view_vector, reflected_ray), surface) * cur_light_source.brightness;
+    cur_color.B = color[2] * pow(cos(view_vector, reflected_ray), surface) * cur_light_source.brightness;
+
+    return cur_color;
 }
 
 void Sphere::init(){
