@@ -37,15 +37,11 @@ void go_to_end_of_line(FILE* file){
     }
 }
 
-Object::Object(){
+Object::Object():
 
-    color = (int*)calloc(3, sizeof(int));
-
-    transpendecy = 0;   //прозрачность
+    color()
+{
     surface = 0;        //параметр рассеивания при отражении
-    color[0] = 228;
-    color[1] = 228;
-    color[2] = 228;
     number_of_param = 0; 
 
     phys_param = NULL;
@@ -53,11 +49,9 @@ Object::Object(){
 
 Object::~Object(){
 
-    transpendecy = 0; 
     surface = 0;        
     number_of_param = 0; 
 
-    free(color);
     free(phys_param);
 }
 
@@ -124,9 +118,36 @@ Point get_point(FILE* input_file){
     return static_cast<Point&&>(tmp_obj);
 }
 
+sf::Color check_color(int* arr_of_colors){
+
+    sf::Color tmp;
+
+    if ((arr_of_colors[0] < 0) || (arr_of_colors[0] > 255)){
+
+        printf("Incorrect RED value[%i]\n", arr_of_colors[0]);
+    }
+
+    if ((arr_of_colors[1] < 0) || (arr_of_colors[1] > 255)){
+
+        printf("Incorrect BLUE value[%i]\n", arr_of_colors[1]);
+    }
+
+    if ((arr_of_colors[2] < 0) || (arr_of_colors[2] > 255)){
+
+        printf("Incorrect GREEN value[%i]\n", arr_of_colors[2]);
+    }
+
+    tmp.r = arr_of_colors[0];
+    tmp.b = arr_of_colors[1];
+    tmp.g = arr_of_colors[2];
+
+    return tmp;
+}
+
 void get_object_params(FILE* input_file, Object& tmp_obj){
 
     float tmp = 0; 
+    int tmp_color[3] = {0, 0, 0};
 
     if (fgetc_without_space(input_file) != '{'){
 
@@ -136,12 +157,14 @@ void get_object_params(FILE* input_file, Object& tmp_obj){
 
     for (int i = 0; i < 3; i++){
 
-        if (fscanf(input_file, "%i", &tmp_obj.color[i]) <= 0){
+        if (fscanf(input_file, "%i", &tmp_color[i]) <= 0){
 
             printf("Incorrect colors data in file[%ld]\n", ftell(input_file));
             go_to_end_of_line(input_file);
         }
     }
+
+    tmp_obj.color = check_color(tmp_color);
 
     if (fgetc_without_space(input_file) != '}'){
 
@@ -152,7 +175,7 @@ void get_object_params(FILE* input_file, Object& tmp_obj){
 
     if (fscanf(input_file, "%f", &tmp) > 0){
 
-        tmp_obj.transpendecy = tmp;
+        tmp_obj.color.a = tmp;
     } else{
 
         printf("Incorrect transpendency data in file[%ld]\n", ftell(input_file));

@@ -84,7 +84,6 @@ Flatness::Flatness(Flatness&& old_obj):
     base_point(old_obj.base_point)
 {
     free(phys_param);
-    free(color);
     free(bounding_points);
     phys_param = old_obj.phys_param;
     color = old_obj.color;
@@ -92,9 +91,7 @@ Flatness::Flatness(Flatness&& old_obj):
 
     old_obj.phys_param = NULL;
     old_obj.bounding_points = NULL;
-    old_obj.color = NULL;
 
-    transpendecy = old_obj.transpendecy;
     surface = old_obj.surface;
     number_of_param = old_obj.number_of_param;
 }
@@ -132,8 +129,6 @@ void Flatness::shift(float delta_t){
 
 Flatness& Flatness::operator = (Flatness&& rv){
 
-    free(color);
-    transpendecy = rv.transpendecy;
     surface = rv.surface;
     color = rv.color;
     number_of_param = rv.number_of_param;
@@ -148,7 +143,6 @@ Flatness& Flatness::operator = (Flatness&& rv){
     velocity = rv.velocity;
 
     rv.phys_param = NULL;
-    rv.color = NULL;
     rv.bounding_points = NULL;
 
     return *this;
@@ -215,9 +209,8 @@ void Flatness::get_info(FILE* output_file){
     fprintf(output_file, "Flatness info:\n\n");
 
     fprintf(output_file, "1) Illumination data:\n");
-    fprintf(output_file, "\ttranspendecy = {%lf}\n", transpendecy);
     fprintf(output_file, "\tsurface = {%lf}\n", surface);
-    fprintf(output_file, "\tcolor = {%i, %i, %i}\n", color[0], color[1], color[2]);
+    fprintf(output_file, "\tcolor = {%i, %i, %i}(%i)\n", color.r, color.g, color.b, color.a);
 
     fprintf(output_file, "2) Flatness data\n\n");
     fprintf(output_file, "\tnormal = {%f, %f, %f}\n", normal[0][0], normal[1][0], normal[2][0]);

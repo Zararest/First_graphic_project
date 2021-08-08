@@ -31,6 +31,18 @@ Light_source::Light_source(FILE* input_file):
     }
 }
 
+Light_source::Light_source(const Light_source& old_obj){
+
+    position = old_obj.position;
+    brightness = old_obj.brightness;
+}
+
+Light_source::Light_source(Light_source&& rv){
+
+    position = rv.position;
+    brightness = rv.brightness;
+}
+
 Light_source::~Light_source(){
 
 }

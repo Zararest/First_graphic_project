@@ -129,6 +129,12 @@ private:
 
     sf::RenderWindow window;
 
+    sf::Uint8* arr_of_pixels;
+
+    sf::Texture screen;
+
+    sf::Sprite sprite;
+
     int vertical_window_size;
 
     int horizontal_window_size;
@@ -169,9 +175,11 @@ public:
 
     int check_event();
 
-    void set_pixel(int horizontal_position, int vertical_position, colour pixel_color);
+    void set_pixel(int horizontal_position, int vertical_position, sf::Color pixel_color);
 
-    colour get_pixel_color(Matrix& vector, Point& base_point_of_vector);
+    sf::Color get_pixel_color(Matrix& vector, Point& base_point_of_vector);
+
+    Light_source check_ray_of_light_intersec(Light_source& cur_light_source, Point& final_point);
     //функция отрисовки кадра 
     //смена позиции наблюдателя
     //?? пока плохо разобрался с отрисовкой

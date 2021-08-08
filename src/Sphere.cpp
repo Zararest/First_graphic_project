@@ -73,18 +73,15 @@ Sphere::Sphere(Sphere&& old_obj):
 {   
     printf("конструктор перемещения сферы\n");
     free(phys_param);
-    free(color);
+    
     radius = old_obj.radius;
     mass = old_obj.mass;
     dissipation = old_obj.dissipation;
     phys_param = old_obj.phys_param;
     color = old_obj.color;
-    transpendecy = old_obj.transpendecy;
     surface = old_obj.surface;
     number_of_param = old_obj.number_of_param;
 
-
-    old_obj.color = NULL;
     old_obj.phys_param = NULL;
     old_obj.radius = 0;
     old_obj.mass = 0;
@@ -111,8 +108,6 @@ void Sphere::shift(float delta_t){
 
 Sphere& Sphere::operator = (Sphere&& rv){
 
-    free(color);
-    transpendecy = rv.transpendecy;
     surface = rv.surface;
     color = rv.color;
     number_of_param = rv.number_of_param;
@@ -125,7 +120,6 @@ Sphere& Sphere::operator = (Sphere&& rv){
     dissipation = rv.dissipation;
     phys_param = rv.phys_param;
 
-    rv.color = NULL;
     rv.phys_param = NULL;
 
     return *this;
@@ -143,9 +137,9 @@ int operator == (const Sphere& fir_sph, const Sphere& sec_sph){
 
 int Sphere::check_intersection(Matrix& vector, Point& base_point_of_vector){
 
-    float tmp_koef_b = base_point_of_vector.x * vector[0][0] + base_point_of_vector.y * vector[1][0] + base_point_of_vector.z * vector[2][0];
+    float tmp_koef_b = (base_point_of_vector.x - centre.x) * vector[0][0] + (base_point_of_vector.y - centre.y) * vector[1][0] + (base_point_of_vector.z - centre.z) * vector[2][0];
     float tmp_koef_a = vector.modul() * vector.modul();
-    float tmp_koef_c = pow(base_point_of_vector.x, 2) + pow(base_point_of_vector.y, 2) + pow(base_point_of_vector.z, 2) - pow(radius, 2);
+    float tmp_koef_c = pow(base_point_of_vector.x - centre.x, 2) + pow(base_point_of_vector.y - centre.y, 2) + pow(base_point_of_vector.z - centre.z, 2) - pow(radius, 2);
     float determinant = 4 * tmp_koef_b * tmp_koef_b - 4 * tmp_koef_a * tmp_koef_c;
 
     if (determinant >= 0){
@@ -159,13 +153,14 @@ int Sphere::check_intersection(Matrix& vector, Point& base_point_of_vector){
 
 Point Sphere::get_intersection_point(Matrix& vector, Point& base_point_of_vector){
 
-    float tmp_koef_b = base_point_of_vector.x * vector[0][0] + base_point_of_vector.y * vector[1][0] + base_point_of_vector.z * vector[2][0];
+    float tmp_koef_b = (base_point_of_vector.x - centre.x) * vector[0][0] + (base_point_of_vector.y - centre.y) * vector[1][0] + (base_point_of_vector.z - centre.z) * vector[2][0];
     float tmp_koef_a = vector.modul() * vector.modul();
-    float tmp_koef_c = pow(base_point_of_vector.x, 2) + pow(base_point_of_vector.y, 2) + pow(base_point_of_vector.z, 2) - pow(radius, 2);
+    float tmp_koef_c = pow(base_point_of_vector.x - centre.x, 2) + pow(base_point_of_vector.y - centre.y, 2) + pow(base_point_of_vector.z - centre.z, 2) - pow(radius, 2);
     float determinant = 4 * tmp_koef_b * tmp_koef_b - 4 * tmp_koef_a * tmp_koef_c;
 
-    if (determinant >= 0){
+    if (determinant < 0){
 
+        printf("Cant find intersec\n");
         return Point();
     }
 
@@ -192,43 +187,14 @@ Point Sphere::get_intersection_point(Matrix& vector, Point& base_point_of_vector
     }
 }
 
-float min(float fir, float sec, float trd){
-
-    if ((fir <= sec) && (fir <= trd)){
-
-        return fir;
-    }
-    
-    if ((sec <= fir) && (sec <= trd)){
-
-        return sec;
-    }
-
-    if ((trd <= fir) && (trd <= sec)){
-
-        return trd;
-    } else{
-
-        printf("dafuq\n");
-        return 0;
-    }
-}
-
-colour Sphere::illumination(Matrix& view_vector, Light_source& cur_light_source, Point& intersec_point){
+sf::Color Sphere::illumination(Matrix& view_vector, Light_source& cur_light_source, Point& intersec_point){
 
     Matrix normal(3, 1, (float)0);
     Matrix ray_of_light(3, 1, (float)0);
     Matrix reflected_ray(3, 1, (float)0);
-    colour cur_color;
-    float brightness_koef = 0;
-
-    if (min(color[0], color[1], color[2]) == 0){
-
-        brightness_koef = 255;
-    } else{
-
-        brightness_koef = 255 / min(color[0], color[1], color[2]);
-    }
+    sf::Color cur_color;
+    
+    view_vector = (-1) * view_vector;
 
     normal = create_vector(centre, intersec_point);
     normal.normalize();
@@ -238,16 +204,31 @@ colour Sphere::illumination(Matrix& view_vector, Light_source& cur_light_source,
 
     reflected_ray = ray_of_light - 2 * projection(ray_of_light, normal) * normal;
 
-    cur_color.R = color[0] * pow(cos(view_vector, reflected_ray), surface) * cur_light_source.brightness;
-    cur_color.G = color[1] * pow(cos(view_vector, reflected_ray), surface) * cur_light_source.brightness;
-    cur_color.B = color[2] * pow(cos(view_vector, reflected_ray), surface) * cur_light_source.brightness;
+    assert(view_vector.modul() != 0);
+    assert(reflected_ray.modul() != 0);
+    
+    /*if (cos(view_vector, reflected_ray) < 0){
 
+        intersec_point.print(stdout);
+        printf("\n");
+        view_vector.print(stdout);
+        printf("-----\n");
+        reflected_ray.print(stdout);
+        fgetc(stdin);
+    } */
+
+    if (cos(view_vector, reflected_ray) > 0){  
+
+        cur_color.r = color.r * pow(cos(view_vector, reflected_ray), surface) * cur_light_source.brightness;
+        cur_color.g = color.g * pow(cos(view_vector, reflected_ray), surface) * cur_light_source.brightness;
+        cur_color.b = color.b * pow(cos(view_vector, reflected_ray), surface) * cur_light_source.brightness;
+    }
+    
     return cur_color;
 }
 
 void Sphere::init(){
 
-    this->color = NULL;
     this->centre.x = 0;
     this->centre.y = 0;
     this->centre.z = 0;
@@ -256,7 +237,6 @@ void Sphere::init(){
     this->phys_param = NULL;
     this->radius = 0;
     this->surface = 0;
-    this->transpendecy = 0;
     this->velocity.init();
 }
 
@@ -265,9 +245,8 @@ void Sphere::get_info(FILE* output_file){
     fprintf(output_file, "Sphere_info:\n\n");
 
     fprintf(output_file, "1) Illumination data:\n");
-    fprintf(output_file, "\ttranspendecy = {%lf}\n", transpendecy);
     fprintf(output_file, "\tsurface = {%lf}\n", surface);
-    fprintf(output_file, "\tcolor = {%i, %i, %i}\n", color[0], color[1], color[2]);
+    fprintf(output_file, "\tcolor = {%i, %i, %i}(%i)\n", color.r, color.g, color.b, color.a);
 
     fprintf(output_file, "2) Sphere data:\n\n");
     fprintf(output_file, "\tnumber of physical parameters = {%i}\n", number_of_param);

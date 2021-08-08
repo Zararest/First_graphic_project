@@ -1,6 +1,7 @@
 #ifndef OBJECTS_H
 #define OBJECTS_H
 
+#include <SFML/Graphics.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 #include <cassert>
@@ -38,15 +39,6 @@ int check_intersection_with_sphere(Sphere& sphere, Matrix& vector, Point& base_p
 
 //Point get_intersection_point(Sphere& space, Matrix& vector, Point& base_point_of_vector);
 
-
-typedef struct color_struct {
-    
-    int R = 255;
-    int G = 255;
-    int B = 255;
-} colour;
-
-
 //-----------------------------------------------------------
 class Field{
 
@@ -69,19 +61,21 @@ public:
 
     Light_source(FILE* input_file);
 
-    Light_source(const Light_source&) = delete;
+    Light_source(const Light_source& old_obj);
 
-    Light_source(Light_source&&) = delete;
+    Light_source(Light_source&& rv);
 
     ~Light_source();
 
-    Light_source& operator = (const Light_source&) = delete;
+    Light_source& operator = (const Light_source& old_obj) = delete;
 
     Light_source& operator = (Light_source&& rv);
 
     void get_info(FILE* output_file);
 
     friend class Sphere;
+
+    friend class Rendering_engine;
 };
 //-----------------------------------------------------------
 
@@ -90,11 +84,9 @@ class Object{
 
 protected:
 
-    float transpendecy;   //прозрачность
-
     float surface;      //параметр рассеивания при отражении
 
-    int* color;
+    sf::Color color;    //прозрачность есть в цвете
 
     int number_of_param; //количество физ параметров
 
@@ -160,7 +152,7 @@ public:
 
     Point get_intersection_point(Matrix& vector, Point& base_point_of_vector);
 
-    colour illumination(Matrix& vector, Light_source& cur_light_source, Point& intersec_point); 
+    sf::Color illumination(Matrix& vector, Light_source& cur_light_source, Point& intersec_point); 
     
     friend int operator == (const Sphere& fir_sph, const Sphere& sec_sph);
 
@@ -181,6 +173,8 @@ public:
     friend class Elastic_interaction;
 
     friend class Physics_engine;
+
+    friend class Rendering_engine;
 };
 //-----------------------------------------------------------
 
@@ -224,7 +218,7 @@ public:
 
     void init();
 
-    colour illumination(Matrix& vector, Light_source& cur_light_source, Point& intersec_point);
+    sf::Color illumination(Matrix& vector, Light_source& cur_light_source, Point& intersec_point);
 
     friend float get_time_before_bump(Flatness& flat, Sphere& sphere);
 
